@@ -1,4 +1,4 @@
-import Todos from "./Todos.js";
+import Todos from "./Todos";
 import React from "react";
 import ReactDOM from "react-dom";
 

@@ -4,6 +4,15 @@
 
 # Gamified Habit Tracker (Todo: Dark Mode)
 This is an RPG habit tracker/task manager similar to Habitica (in progress). 
+
+## Todos
+- [x] Todo Functionality
+- [ ] Dark Mode using Halfmoon Framework (In Progress)
+- [ ] Rewards Functionality
+- [ ] Habit Functionality
+- [ ] Dailies Functionality
+
 ## Sample
 ![image](https://user-images.githubusercontent.com/76241888/130778490-f2903a27-d4e1-4981-9fc7-f26602a97623.png)
+
 
