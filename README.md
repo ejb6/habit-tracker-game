@@ -6,6 +6,7 @@
 This is an RPG habit tracker/task manager similar to Habitica (in progress). 
 
 ## Todos
+- [x] Todo Functionality
 - [ ] Dark Mode
 - [ ] Rewards Functionality
 - [ ] Habit Functionality
