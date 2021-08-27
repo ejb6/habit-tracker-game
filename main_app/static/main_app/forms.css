@@ -21,13 +21,5 @@ main {
 	font-weight: 400;
 }
 
-.form-signin .form-floating:focus-within {
-	z-index: 2;
-}
-
-.form-signin input {
-	border-radius: 0;
-	margin-bottom: -1px;
-}
 
 

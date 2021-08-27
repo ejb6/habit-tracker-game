@@ -2,27 +2,41 @@
 {% load static %}
 {% block body %}
 
-<div class="container-fluid py-3 mx-0 my-4 bg-gray-200">
-	<div class="py-sm-5 px-md-5 ">
-		<h1 class="fw-bold">Habit50 RPG</h1>
-		<p class="fs-4">
+<div>
+	<div class="py-20 px-10 my-20">
+		<h1 class="font-weight-bold">Habit50 RPG</h1>
+		<p class="font-size-16">
 			A gamified task manager similar to Habitica.
 		</p>
-		<button onclick="document.location='/login'" class="btn btn-secondary me-2 mb-2">Login</button>  
-		<button onclick="document.location='/register'" class="btn btn-secondary mb-2">Sign Up</button>
+		<button 
+			onclick="document.location='/login'" 
+			class="btn btn-primary mr-5 mb-5"
+		>
+			Login
+		</button>  
+		<button 
+			onclick="document.location='/register'" 
+			class="btn btn-secondary mb-5"
+		>
+			Sign Up
+		</button>
 	</div>
 </div>
-<div class="mx-0 container-fluid pt-4 border-top row">
-	<div class="col-md px-sm-5">
-		<h2>Track Your Habits and Goals</h2>
-		<p class="fs-6">
-			Stay accountable by tracking and managing your Habits, Daily goals, and To Do list with Habit50's easy-to-use mobile and web interface.
+<div class="mx-0 container-fluid pt-15 px-10 border-top row">
+	<div class="col-md mx-sm-10">
+		<h3 class="font-weight-bold">Track Your Habits and Goals</h3>
+		<p class="font-size-16">
+			Stay accountable by tracking and managing your Habits, 
+			Daily goals, and ToDo list with Habit50's easy-to-use 
+			mobile and web interface.
 		</p>
 	</div>
-	<div class="col-md px-sm-5">
-		<h2>Earn Rewards For Your Goals</h2>
-		<p class="fs-6">
-			Check off tasks to level up your character and unlock in-game features such as avatar customizations, accessories, and magic items!
+	<div class="col-md mx-sm-10">
+		<h3 class="font-weight-bold">Earn Rewards For Your Goals</h3>
+		<p class="font-size-16">
+			Check off tasks to level up your character 
+			and unlock in-game features such as avatar 
+			customizations, accessories, and magic items!
 		</p>
 	</div>
 </div>

@@ -3,18 +3,22 @@
 {% block body %}
 
 
-<div id="main_div" class="row">
+<div id="main_div" class="row py-15">
 	<!-- Column 1 -->
-	<div class="col-sm border-start">
+	<div class="col-sm-8 col-lg-7 border-left px-10">
 
 		<!-- Profile Banner -->
-		<div id="profile_banner" class="my-3">
+		<div id="profile_banner" class="my-5">
 			<!-- Profile Avatar -->
 
-			<img class="avatar" src="{% static 'main_app/images/' %}{{ user.avatar }}.svg" alt="Avatar">
+			<img 
+				class="avatar mr-15" 
+				src="{% static 'main_app/images/' %}{{ user.avatar }}.svg" 
+				alt="Avatar"
+			>
 			<!-- Profile Status -->
-			<div class="container-fluid">
-				<h6 class="my-2 border-bottom">
+			<div id="profile_stats">
+				<h6 class="border-bottom">
 					{{ user.nickname }}, Level {{ user.level }}
 				</h6>
 
@@ -24,7 +28,13 @@
 					{{ user.health_current }}/{{ user.health_max }}
 				</small>
 				<div class="progress">
-					<div class="progress-bar bg-danger" role="progressbar" style="width: {{ hp_percent }}%" aria-valuenow={{ user.health_current }} aria-valuemin="0" aria-valuemax={{ user.health_max }}></div>
+					<div 
+						class="progress-bar bg-danger" role="progressbar" 
+						style="width: {{ hp_percent }}%" 
+						aria-valuenow={{ user.health_current }} 
+						aria-valuemin="0" aria-valuemax={{ user.health_max }}
+					>
+					</div>
 				</div>
 
 				<!-- Exp Bar -->
@@ -33,116 +43,105 @@
 					{{ user.exp_current }}/{{ user.exp_next }}
 				</small>
 				<div class="progress">
-					<div class="progress-bar bg-info" role="progressbar" style="width: 10%" aria-valuenow={{ user.exp_current }} aria-valuemin="0" aria-valuemax={{ user.exp_next }}></div>
+					<div 
+						class="progress-bar bg-indigo" role="progressbar" 
+						style="width: 10%" aria-valuenow={{ user.exp_current }} 
+						aria-valuemin="0" aria-valuemax={{ user.exp_next }}
+					>
+					</div>
 				</div>
 			</div>
 		</div>
 
 		<!-- Task -->
 		<h3>Tasks</h3>
-		<!-- Navigation -->
-		<ul class="nav nav-tabs" id="myTab" role="tablist">
-			<!-- Todos -->
-			<li class="nav-item" role="presentation">
-				<button class="nav-link active" id="todos-tab" data-bs-toggle="tab" data-bs-target="#todos" type="button" role="tab" aria-controls="todos" aria-selected="true">
-					Todos
-				</button>
-			</li>
-			<!-- Habits -->
-			<li class="nav-item" role="presentation">
-				<button class="nav-link" id="habits-tab" data-bs-toggle="tab" data-bs-target="#habits" type="button" role="tab" aria-controls="habits" aria-selected="false">
-					Habits
-				</button>
-			</li>
-			<!-- Dailies -->
-			<li class="nav-item" role="presentation">
-				<button class="nav-link" id="dailies-tab" data-bs-toggle="tab" data-bs-target="#dailies" type="button" role="tab" aria-controls="dailies" aria-selected="false">
-					Dailies
-				</button>
-			</li>
-		</ul>
-		<!-- Actual Tasks -->
-		<div class="tab-content p-1 bg-white border border-top-0" id="myTabContent">
-			<!-- Todo Tab -->
-			<div class="tab-pane fade show active" id="todos" role="tabpanel" aria-labelledby="todos-tab">
-				<!-- Todo Items -->
-			</div>
-
-			<!-- Habits Tab -->
-			<div class="tab-pane fade" id="habits" role="tabpanel" aria-labelledby="habits-tab">Habits</div>
-
-			<!-- Dailies Tab -->
-			<div class="tab-pane fade" id="dailies" role="tabpanel" aria-labelledby="dailies-tab">Dailies</div>
+		<!-- Tab Links -->
+		<div id="tabs">
+			<button id="todos-tab" class="tablinks active" 
+				onclick="openTab('todos')"
+			>
+				Todos
+			</button>
+			<button id="habits-tab" class="tablinks" 
+				onclick="openTab('habits')"
+			>
+				Habits
+			</button>
+			<button id="dailies-tab" class="tablinks" 
+				onclick="openTab('dailies')"
+			>
+				Dailies
+			</button>
 		</div>
+		<!-- Tab Contents -->
+		<div id="todos" class="tabcontent">Todo</div>
+		<div id="habits" class="tabcontent">Habits</div>
+		<div id="dailies" class="tabcontent">Dailies</div>
 		
 	</div>
 	<!-- Column 2 -->
-	<div class="col-sm-5 border-start py-3">
+	<div class="col-sm-4 col-lg-5 border-left px-10">
 		<h3>Rewards</h3>
 		<div class="mb-3 border-bottom">
-			<small>
+			<div>
 				You have 100 <i class="fas fa-coins"></i>
-			</small>
+			</div>
 		</div>
-		<div class="card-group row row-cols-auto g-3">
-			<div class="col">
+		<div class="row">
 				<div class="card">
-					<img class="avatar" src={% static 'main_app/images/food.svg' %} alt="Elf">
-					<div class="card-body p-2">
-						<small class="text-secondary">Food (10HP)</small>
+					<img 
+						class="avatar bg-yellow" 
+						src={% static 'main_app/images/food.svg' %} alt="Food"
+					>
+					<div class="card-body pb-5 px-10">
+						<small class="text-indigo">Food (10HP)</small>
 						<small>75 <i class="fas fa-coins"></i></small>
 					</div>
 				</div>
-			</div>
-			<div class="col">
 				<div class="card">
-					<img class="avatar" src={% static 'main_app/images/potion.svg' %} alt="Elf">
-					<div class="card-body p-2">
-						<small class="text-secondary">40HP Potion</small>
+					<img 
+						class="avatar" 
+						src={% static 'main_app/images/potion.svg' %} alt="Potion"
+					>
+					<div class="card-body pb-5 px-10">
+						<small class="text-indigo">Potion (40 HP)</small>
 						<small>300 <i class="fas fa-coins"></i></small>
 					</div>
 				</div>
-			</div>
-			<div class="col">
 				<div class="card">
-					<img class="avatar" src={% static 'main_app/images/orc.svg' %} alt="Orc">
-					<div class="card-body p-2">
-						<small class="text-secondary">Orc Avatar</small>
+					<img 
+						class="avatar" 
+						src={% static 'main_app/images/orc.svg' %} alt="Orc"
+					>
+					<div class="card-body pb-5 px-10">
+						<small class="text-indigo">Orc Avatar</small>
 						<small>500 <i class="fas fa-coins"></i></small>
 					</div>
 				</div>
-			</div>
-			<div class="col">
 				<div class="card">
-					<img class="avatar" src={% static 'main_app/images/elf-girl.svg' %} alt="Elf">
-					<div class="card-body p-2">
-						<small class="text-secondary">Elf Avatar</small>
-						<small>900 <i class="fas fa-coins"></i></small>
+					<img 
+						class="avatar" 
+						src={% static 'main_app/images/elf-girl.svg' %} alt="Elf"
+					>
+					<div class="card-body pb-5 px-10">
+						<small class="text-indigo">Elf Avatar</small>
+						<small>850 <i class="fas fa-coins"></i></small>
 					</div>
 				</div>
-			</div>
-			<div class="col">
 				<div class="card">
-					<img class="avatar" src={% static 'main_app/images/grim-reaper.svg' %} alt="Grim Reaper">
-					<div class="card-body p-2">
-						<small class="text-secondary">Reaper Avatar</small>
-						<small>2000 <i class="fas fa-coins"></i></small>
+					<img 
+						class="avatar" 
+						src={% static 'main_app/images/grim-reaper.svg' %} alt="Reaper"
+					>
+					<div class="card-body pb-5 px-10">
+						<small class="text-indigo">Reaper Avatar</small>
+						<small>2500 <i class="fas fa-coins"></i></small>
 					</div>
 				</div>
-			</div>
-			<div class="col">
-				<div class="card">
-					<img class="avatar" src={% static 'main_app/images/witch.svg' %} alt="Elf">
-					<div class="card-body p-2">
-						<small class="text-secondary">Witch Avatar</small>
-						<small>3000 <i class="fas fa-coins"></i></small>
-					</div>
-				</div>
-			</div>
 		</div>
 	</div>
 </div>
 
 <!-- JS -->
-<script type="module" src={% static 'main_app/js/main.js' %}></script>
+<script src={% static 'main_app/js/tabNav.js' %}></script>
 {% endblock %}
