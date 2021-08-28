@@ -6,43 +6,54 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>{% block title %}Habit50 RPG{% endblock %}</title>
-	<!-- Bootstrap CSS -->
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-	<link href={% static 'main_app/theme.css' %} rel="stylesheet"> 
+	<!-- Halfmoon CSS -->
+	<link href="https://cdn.jsdelivr.net/npm/halfmoon@1.1.1/css/halfmoon-variables.min.css" rel="stylesheet" />
+	<!-- Halfmoon Customizations -->
+	<link href="{% static 'main_app/theme.css' %}" rel="stylesheet">
 	<!-- FontAwesome Icons -->
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous">
 	<!-- Custom Styles -->
 	<link href="{% static 'main_app/styles.css' %}" rel="stylesheet">
-	<!-- Bootstrap JS -->
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
 	{% block custom_head_items %}
 	{% endblock %}
 </head>
-<body>
-	<div class="container py-4">
-		<header class="pb-3 mb-3 border-bottom"> 
-			<a href="/" class="text-decoration-none text-primary">
-				<h4 class="mt-2">
+<body data-set-preferred-mode-onload="true">
+	<!-- This area is for rendering modals -->
+	<div id="hidden">
+		<!-- Hidden by default -->
+		<div id="add-todo"></div>
+		<div id="edit-todo"></div>
+	</div>
+
+	<div class="container">
+		<nav class="navbar pt-10">
+			<a href="/" class="navbar-brand">
+				<h4 class="font-weight-bold">
 					<i class="fas fa-dragon"></i>
 					Habit50 RPG
 				</h4>
 			</a>
-			<div class="dropdown">
-				<button class="px-2 py-0 btn btn-light"  type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-					<i class="fs-4 p-2 fas fa-bars"></i>
+			<button 
+				class="btn btn-square ml-auto mx-5" 
+				type="button" 
+				onclick="halfmoon.toggleDarkMode()"
+			>
+				<i class="fas fa-moon"></i>
+			</button>
+			{% if user.is_authenticated %}
+				<button 
+					class="btn btn-square" 
+					type="button" 
+					onclick="document.location='/logout'"
+				>
+					<i class="fas fa-power-off"></i>
 				</button>
-				<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-				{% if user.is_authenticated %}
-					<li><a class="dropdown-item" href="/logout">Logout</a></li>
-				{% else %}
-					<li><a class="dropdown-item" href="/login">Login</a></li>
-					<li><a class="dropdown-item" href="/register">Sign Up</a></li>
-				{% endif %}
-				</ul>
-			</div>
-		</header>
+			{% endif %}
+		</nav>
 		{% block body %}
 		{% endblock %}
 	</div>
+	<!-- Halfmoon JS -->
+	<script src="https://cdn.jsdelivr.net/npm/halfmoon@1.1.1/js/halfmoon.min.js"></script>
 </body>
 </html>

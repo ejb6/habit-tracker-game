@@ -1,128 +1,103 @@
-
-header {
-	display: flex;
-	justify-content: space-between;
-}
-
-header > a:hover {
-	color: black;
-}
-
-.btn {
-	box-shadow: none;
-}
-
-.avatar {
-	height: 125px;
-	padding: 10px;
-	background-color: #f5ecd2;
-}
-
-.card {
-	width: 125px;
-}
-
-.card-body small {
-	display: block;
-}
-
-.text-gray {
-	color: var(--bs-gray-700);
-}
-
-
-#main_div {
-	min-height: 70vh;
-	margin: 1px;
-	background-color: #fafafa;
-}
-
-
-#main_div a {
-	color: black;
-}
-
-.nav-link {
-	color: var(--bs-secondary);
-}
-
-.bg-gray-200 {
-	background-color: var(--bs-gray-200);
-}
-
-.todo-item {
-	display: flex;
-	background-color: var(--bs-gray-200);
-}
-
-.todo-item button {
-	border-radius: 0;
-}
-
-.todo-item.completed, .todo-item.completed small {
-	color: gray !important;
-}
-
-
-.overflow-hide {
-	overflow: hidden;
-}
-
-.deadline {
-	padding: 10px;
-}
-
-.todo-desc {
-	display: flex;
-}
-
-#profile_pic {
-	display: inline-block;
-	width: 130px;
-	height: 130px;
-	background-color: #d0ffff;
-}
-
+/* Profile Elements */
 #profile_banner {
 	display: flex;
 }
 
-#profile_banner div {
-	max-width: 300px;
-	margin-left: 0;
+#profile_stats {
+	width: 100%;
+	max-width: 240px;
 }
 
-#profile_banner > div > small {
-	font-size: 0.8em;
-	font-weight: 600;
+.avatar {
+	width: 110px;
+	height: 110px;
+	background-color: #a696a2;
+	padding: 10px;
 }
 
-.add-item button:hover {
-	background-color: #f1f1f1 !important;
+/* Tab navigation */
+.tabcontent {
+	display: none;
 }
 
-.rdtPicker {
-	border: 1px solid #d0d0d0 !important;
-	border-radius: 10px;
+#todos {
+	display: block;
 }
 
-td.rdtToday {
-	background-color: #e1effb;
+#tabs {
+	overflow: hidden;
+	background-color: transparent;
 }
 
-.delete-item-button {
-	background-color: gray;
+#tabs > button {
+	background-color: #dbdbdb;
+	float: left;
+	border: none;
+	border-radius: 0;
+	outline: none;
+	padding: 10px 15px;
+	cursor: pointer;
 }
 
-.btn-success {
-	color: var(--bs-light);
+#tabs > button:hover {
+	background-color: #d2d2d2;
 }
 
+#tabs > button.active {
+	background-color: #bbbbbb;
+}
+
+.tabcontent {
+	background-color: #bbbbbb;
+	padding: 5px;
+}
+
+
+/* Rewards */
 .fa-coins {
-	color: #ef7c20;
+	color: #e87516;
 }
 
-.todo-title {
-	flex-grow: 1;
-	padding-left: 10px;
+.card {
+	padding: 0;
+	margin: 10px;
+	border: 0;
+	outline: 1px solid #aaa;
 }
+
+.card-body small {
+	display: block;	
+}
+
+/* Todo Items */
+.todo-item {
+	display: flex;
+	background-color: #dfdfdf;
+}
+
+.dark-mode .todo-item {
+	background-color: #444;
+}
+
+.todo-item .todo-title {
+	flex-grow: 1;
+}
+
+.todo-item button {
+	border-radius: 0;
+	border: 0;
+	outline: 0;
+	cursor: pointer;
+	padding-left: 8px;
+	padding-right: 8px;
+}
+
+.dark-mode .btn.bg-gray-light:hover {
+	/* Add todo/habit/dailies buttons */
+	background-color: #444;
+}
+
+body:not(.dark-mode) .btn.bg-gray-light:hover {
+	background-color: #f9f9f9;
+}
+
