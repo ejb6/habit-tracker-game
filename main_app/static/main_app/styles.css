@@ -47,6 +47,25 @@
 	background-color: #bbbbbb;
 }
 
+.dark-mode #tabs > button {
+	background-color: #494949;
+	color: white;
+}
+
+.dark-mode #tabs > button:hover {
+	background-color: #494949;
+	color: var(--indigo-color-very-light);
+}
+
+.dark-mode #tabs > button.active {
+	background-color: #292929;
+}
+
+.dark-mode .tabcontent {
+	background-color: #292929;
+}
+
+
 .tabcontent {
 	background-color: #bbbbbb;
 	padding: 5px;
@@ -57,6 +76,15 @@
 .fa-coins {
 	color: #e87516;
 }
+
+.dark-mode .avatar {
+	background-color: #5b5b5b;
+}
+
+.dark-mode .card {
+	outline-color: var(--dark-color);
+}
+
 
 .card {
 	padding: 0;
@@ -92,12 +120,38 @@
 	padding-right: 8px;
 }
 
-.dark-mode .btn.bg-gray-light:hover {
-	/* Add todo/habit/dailies buttons */
-	background-color: #444;
+/* Datetime Picker */
+.dark-mode .rdtPicker {
+	background-color: #1d1d1d;
+	border: 1px solid #414141;
 }
 
-body:not(.dark-mode) .btn.bg-gray-light:hover {
-	background-color: #f9f9f9;
+.dark-mode .rdtPicker td.rdtDay:hover {
+	background-color: #575757;
 }
+
+.dark-mode .rdtPicker td.rdtActive {
+	background-color: #0059a6;
+}
+
+.dark-mode .rdtPicker thead tr:first-of-type th:hover {
+	background-color: #575757;
+}
+
+.dark-mode td.rdtMonth:hover,
+.dark-mode td.rdtYear:hover {
+	background-color: #575757;
+}
+
+.dark-mode .rdtPicker td.rdtHour:hover,
+.dark-mode .rdtPicker td.rdtMinute:hover,
+.dark-mode .rdtPicker td.rdtSecond:hover,
+.dark-mode .rdtPicker .rdtTimeToggle:hover {
+	background-color: #575757;
+}
+
+.dark-mode .rdtCounter .rdtBtn:hover {
+	background-color: #575757;
+}
+
 
