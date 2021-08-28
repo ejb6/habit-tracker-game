@@ -44,7 +44,12 @@
 }
 
 #tabs > button.active {
-	background-color: #ccc;
+	background-color: #bbbbbb;
+}
+
+.tabcontent {
+	background-color: #bbbbbb;
+	padding: 5px;
 }
 
 
@@ -62,5 +67,37 @@
 
 .card-body small {
 	display: block;	
+}
+
+/* Todo Items */
+.todo-item {
+	display: flex;
+	background-color: #dfdfdf;
+}
+
+.dark-mode .todo-item {
+	background-color: #444;
+}
+
+.todo-item .todo-title {
+	flex-grow: 1;
+}
+
+.todo-item button {
+	border-radius: 0;
+	border: 0;
+	outline: 0;
+	cursor: pointer;
+	padding-left: 8px;
+	padding-right: 8px;
+}
+
+.dark-mode .btn.bg-gray-light:hover {
+	/* Add todo/habit/dailies buttons */
+	background-color: #444;
+}
+
+body:not(.dark-mode) .btn.bg-gray-light:hover {
+	background-color: #f9f9f9;
 }
 

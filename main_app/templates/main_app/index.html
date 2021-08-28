@@ -74,7 +74,24 @@
 			</button>
 		</div>
 		<!-- Tab Contents -->
-		<div id="todos" class="tabcontent">Todo</div>
+		<div id="todos" class="tabcontent">
+			<!-- Button for adding a todo -->
+			<div class='my-5 text-center add-item'>
+				<button
+					type='button'
+					onclick='window.location.href="#add-todo-modal"'
+					class='btn bg-gray-light w-full'
+					id='add-todo-btn'
+				>
+					<i class='far fa-plus-square'></i>
+					Add a Todo
+				</button>
+			</div>
+
+			<div id="todo-items">
+				<!-- To be filled using react -->
+			</div>
+		</div>
 		<div id="habits" class="tabcontent">Habits</div>
 		<div id="dailies" class="tabcontent">Dailies</div>
 		
@@ -144,4 +161,5 @@
 
 <!-- JS -->
 <script src={% static 'main_app/js/tabNav.js' %}></script>
+<script src={% static 'main_app/js/main.js' %}></script>
 {% endblock %}
