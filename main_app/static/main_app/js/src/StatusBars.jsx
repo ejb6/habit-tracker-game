@@ -1,3 +1,6 @@
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// This file is for displaying health, exp, gold
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Todos from './Todos';
@@ -23,6 +26,11 @@ function StatusBar(props) {
       </div>
     </div>
   );
+}
+
+// For displaying the player's gold:
+function Gold({gold}) {
+  return ReactDOM.createPortal(gold, document.querySelector('#gold'));
 }
 
 // For rendering all status bars
@@ -66,6 +74,7 @@ function StatusBars() {
         max={state.expNext}
         bgColor='bg-indigo'
       />
+      <Gold gold={state.gold}/>
     </div>
   );
 }

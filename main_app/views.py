@@ -88,16 +88,7 @@ def todos(request):
         if data["action"] == "mark":
             todo.completed = datetime.now(timezone.utc)
             todo.save()
-
-            # Level up the user (increase in exp)
-            request.user.exp_current += 10
-            if request.user.exp_current >= request.user.exp_next:
-                request.user.exp_current -= request.user.exp_next
-                request.user.exp_next += 20
-                request.user.level += 1
-                request.user.health_max += 5
-                request.user.health_current += 5
-            request.user.save()
+            request.user.task_complete()
 
             # Return the updated Todo object:
             return JsonResponse(todo.serialize(), status=200)
@@ -106,16 +97,7 @@ def todos(request):
         elif data["action"] == "unmark":
             todo.completed = None
             todo.save()
-
-            # Level down the user (revert back to original)
-            request.user.exp_current -= 10
-            if request.user.exp_current < 0:
-                request.user.exp_next -= 20
-                request.user.exp_current += request.user.exp_next
-                request.user.level -= 1
-                request.user.health_max -= 5
-                request.user.health_current -= 5
-            request.user.save()
+            request.user.task_incomplete()
 
             # Return the updated Todo object:
             return JsonResponse(todo.serialize(), status=200)
@@ -164,6 +146,7 @@ def user_stats(request):
     return JsonResponse({
         "nickname": user.nickname,
         "level": user.level,
+        "gold": user.gold,
         "healthCurrent": user.health_current,
         "healthMax": user.health_max,
         "expCurrent": user.exp_current,
