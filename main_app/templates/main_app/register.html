@@ -8,27 +8,27 @@
 {% endblock %}
 
 {% block body %}
-<main class="text-center form-signin">
+<main class="form-signin">
 	<form method="POST" action="/register">
-		<h1 class="h3 mb-3 fw-normal">Create an Account</h1>
-		<div class="form-floating">
-			<input type="text" name="username" class="form-control" id="floatingInput" placeholder="username">
+		<h3 class="fw-normal">Create an Account</h3>
+		<div class="mb-5">
 			<label for="floatingInput">Username</label>
+			<input type="text" name="username" class="form-control" id="floatingInput" placeholder="username">
 		</div>
-		<div class="form-floating">
-			<input type="text" name="nickname" class="form-control" id="floatingInput" placeholder="Nickname" maxlength="10">
+		<div class="mb-5">
 			<label for="floatingInput">Nickname</label>
+			<input type="text" name="nickname" class="form-control" id="floatingInput" placeholder="Nickname" maxlength="10">
 		</div>
-		<div class="form-floating">
-			<input type="password" class="form-control" name="password" id="floatingPassword" placeholder="Password">
+		<div class="mb-5">
 			<label for="floatingPassword">Password</label>
+			<input type="password" class="form-control" name="password" id="floatingPassword" placeholder="Password">
 		</div>
-		<div class="form-floating mb-3">
-			<input type="password" class="form-control" name="confirmation" id="floatingPassword" placeholder="Password">
+		<div class="mb-10">
 			<label for="floatingPassword">Confirm Password</label>
+			<input type="password" class="form-control" name="confirmation" id="floatingPassword" placeholder="Password">
 		</div>
 		{% csrf_token %}
-		<button class="w-100 btn btn-lg btn-success text-white" type="submit">Sign Up</button>
+		<button class="w-100 btn btn-lg btn-secondary text-white" type="submit">Sign Up</button>
 	</form>
 </main>
 {% endblock %} 
