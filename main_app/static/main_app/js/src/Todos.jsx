@@ -15,10 +15,6 @@ function TodoItem(props) {
 
   // The following ID is for editing a todo item:
   const editTodoButtonId = 'edit-todo-button-' + todo.id;
-  // Everytime the Todo item changes:
-  React.useEffect(() => {
-    console.log("hey");
-  }, []);
   // Classes of some element changes based on task completion
   // The div element for a single Todo item (buttons included):
   return (
@@ -32,8 +28,10 @@ function TodoItem(props) {
         ? (
           <button
             type='button'
-            className='bg-success mr-10'
-            onClick={() => markTodo('unmark', todo.id, setTodo)}
+            className='bg-secondary mr-10 mark'
+            onClick={() => {
+              markTodo('unmark', todo.id, setTodo, props.fetchStats);
+            }}
           >
             <i className='fas fa-check-square' />
           </button>
@@ -41,8 +39,10 @@ function TodoItem(props) {
         : (
           <button
             type='button'
-            className='bg-warning mr-10'
-            onClick={() => markTodo('mark', todo.id, setTodo)}
+            className='bg-warning mr-10 mark'
+            onClick={() => {
+              markTodo('mark', todo.id, setTodo, props.fetchStats);
+            }}
           >
             <i className='far fa-check-square' />
           </button>
@@ -64,7 +64,7 @@ function TodoItem(props) {
         ? (
           <button
             type='button'
-            className='delete-item-button'
+            className='delete-item-button bg-gray'
             onClick={() => deleteTodo(todo.id, props.setTodoAll)}
           >
             <i className='far fa-trash-alt' />
@@ -75,7 +75,6 @@ function TodoItem(props) {
             type='button'
             className='delete-item-button bg-gray'
             onClick={() => {
-              console.log(todo);
               editTodoSubmit(todo, setTodo, props.setTodoAll);
               window.location.href='#edit-todo-modal';
             }}
@@ -89,7 +88,7 @@ function TodoItem(props) {
 
 
 // Used to display all of the todo items together:
-function Todos() {
+function Todos({fetchStats}) {
   const [todoAll, setTodoAll] = React.useState([]);
 
   // Delete Todo 
@@ -122,6 +121,7 @@ function Todos() {
           key={todo.id}
           todo={todo}
           setTodoAll={setTodoAll}
+          fetchStats={fetchStats}
         />
       ))}
     </div>

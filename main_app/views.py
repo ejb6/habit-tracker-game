@@ -15,9 +15,7 @@ def index(request):
         return render(request, "main_app/splash.html")
     # Display the task manager app if the user is logged in:
     else:
-        return render(request, "main_app/index.html", {
-            "hp_percent": request.user.health_current // 
-            request.user.health_max * 100 })
+        return render(request, "main_app/index.html")
 
 # Login the user:
 def login_view(request):
@@ -93,7 +91,7 @@ def todos(request):
 
             # Level up the user (increase in exp)
             request.user.exp_current += 10
-            if request.user.exp_current > request.user.exp_next:
+            if request.user.exp_current >= request.user.exp_next:
                 request.user.exp_current -= request.user.exp_next
                 request.user.exp_next += 20
                 request.user.level += 1
@@ -112,7 +110,7 @@ def todos(request):
             # Level down the user (revert back to original)
             request.user.exp_current -= 10
             if request.user.exp_current < 0:
-                request.user.exp_next -= 10
+                request.user.exp_next -= 20
                 request.user.exp_current += request.user.exp_next
                 request.user.level -= 1
                 request.user.health_max -= 5
@@ -160,3 +158,13 @@ def todos(request):
         [todo.serialize() for todo in todo_all],
         safe=False, status=200)
 
+@login_required
+def user_stats(request):
+    user = request.user
+    return JsonResponse({
+        "nickname": user.nickname,
+        "level": user.level,
+        "healthCurrent": user.health_current,
+        "healthMax": user.health_max,
+        "expCurrent": user.exp_current,
+        "expNext": user.exp_next}, status=200)

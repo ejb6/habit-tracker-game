@@ -18,38 +18,6 @@
 			>
 			<!-- Profile Status -->
 			<div id="profile_stats">
-				<h6 class="border-bottom">
-					{{ user.nickname }}, Level {{ user.level }}
-				</h6>
-
-				<!-- Health bar -->
-				<small id="health">
-					Health 
-					{{ user.health_current }}/{{ user.health_max }}
-				</small>
-				<div class="progress">
-					<div 
-						class="progress-bar bg-danger" role="progressbar" 
-						style="width: {{ hp_percent }}%" 
-						aria-valuenow={{ user.health_current }} 
-						aria-valuemin="0" aria-valuemax={{ user.health_max }}
-					>
-					</div>
-				</div>
-
-				<!-- Exp Bar -->
-				<small id="exp">
-					Exp 
-					{{ user.exp_current }}/{{ user.exp_next }}
-				</small>
-				<div class="progress">
-					<div 
-						class="progress-bar bg-indigo" role="progressbar" 
-						style="width: 10%" aria-valuenow={{ user.exp_current }} 
-						aria-valuemin="0" aria-valuemax={{ user.exp_next }}
-					>
-					</div>
-				</div>
 			</div>
 		</div>
 

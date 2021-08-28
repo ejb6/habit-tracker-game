@@ -7,7 +7,7 @@ import csrftoken from './csrf'
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 // Used to mark/unmark a todo as completed:
-function markTodo(action, todoId, setTodo) {
+function markTodo(action, todoId, setTodo, fetchStats) {
 	// 'action' parameter can be 'mark' or 'unmark'
 	// Send a fetch request to mark the todo in Django:
 	fetch('/todos', {
@@ -23,6 +23,7 @@ function markTodo(action, todoId, setTodo) {
 			response.text().then((text) => alert(text));
 		} else {
 			alert('Success!');
+			fetchStats();
 			// Update the todo element:
 			response.json().then((json) => {
 				setTodo(json);
