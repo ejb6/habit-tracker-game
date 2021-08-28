@@ -8,8 +8,8 @@ This is an RPG habit tracker/task manager similar to Habitica (in progress).
 ## Todos
 - [x] Todo Functionality
 - [x] Dark Mode using Halfmoon Framework
-- [ ] Status Bars (Health, Exp) using React (In Progress)
-- [ ] Rewards Functionality
+- [x] Status Bars (Health, Exp) using React
+- [ ] Rewards Functionality (In Progress)
 - [ ] Habit Functionality
 - [ ] Dailies Functionality
 
