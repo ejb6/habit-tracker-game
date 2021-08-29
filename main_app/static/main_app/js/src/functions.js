@@ -6,6 +6,14 @@ import csrftoken from './csrf'
 // marking a todo as completed etc.
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+// Used for showing rewards received when completing a task:
+function rewardPopup() {
+	let popup = document.querySelector('#rewards-popup');
+	popup.style.display = 'block';
+	// Dismiss popup after 4 seconds:
+	setTimeout(() => {popup.style.display = 'none'}, 4000);
+}
+
 // Used to mark/unmark a todo as completed:
 function markTodo(action, todoId, setTodo, fetchStats) {
 	// 'action' parameter can be 'mark' or 'unmark'
@@ -22,11 +30,13 @@ function markTodo(action, todoId, setTodo, fetchStats) {
 			// If something is wrong
 			response.text().then((text) => alert(text));
 		} else {
-			alert('Success!');
 			fetchStats();
 			// Update the todo element:
 			response.json().then((json) => {
 				setTodo(json);
+				if (json.completed) {
+					rewardPopup();
+				}
 			});
 		}
 	});

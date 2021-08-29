@@ -11,4 +11,6 @@ function openTab(tabName) {
 	document.getElementById(tabName + '-tab').className += ' active';
 }
 
-
+document.querySelector('.dismiss-popup').onclick = () => {
+	document.querySelector('#rewards-popup').style.display = 'none';
+}
