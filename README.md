@@ -16,8 +16,7 @@ This is an RPG habit tracker/task manager similar to Habitica (in progress).
 - [ ] Dailies Functionality
 
 ## Sample
-![image](https://user-images.githubusercontent.com/76241888/131152026-a8c1e965-4a91-493a-8217-336fd0252e8a.png)
-
+![sample](https://user-images.githubusercontent.com/76241888/131252943-376a6014-007b-431b-9ef9-3597ce2db875.gif)
 
 ## How to Run
 Please note the this project is still being developed.
