@@ -10,7 +10,7 @@ This is an RPG habit tracker/task manager similar to Habitica (in progress).
 - [x] Dark Mode using Halfmoon Framework
 - [x] Status Bars (Health, Exp) using React
 - [ ] Rewards Functionality (In Progress)
-  - [ ] Show a reward pop-up when completing tasks
+  - [x] Show a reward pop-up when completing tasks
   - [ ] Ability to purchase
 - [ ] Habit Functionality
 - [ ] Dailies Functionality
