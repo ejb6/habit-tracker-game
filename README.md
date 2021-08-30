@@ -19,7 +19,7 @@ This is an RPG habit tracker/task manager similar to Habitica (in progress).
 ![sample](https://user-images.githubusercontent.com/76241888/131252943-376a6014-007b-431b-9ef9-3597ce2db875.gif)
 
 ## How to Run
-Please note the this project is still being developed.
+Please note that this project is still being developed.
 1. Download a copy of this repo.
 2. [Download Django](https://www.djangoproject.com/download/)
 3. Run the commandline and change directory into the project (where `manage.py` is located)
