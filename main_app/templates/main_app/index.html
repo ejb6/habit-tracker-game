@@ -76,7 +76,7 @@
 		<div id="rewards" class="row">
 
 			{% for item in rewards_list %}
-				<div class="card reward-item">
+				<div id={{ item.name }} class="card reward-item">
 					<img 
 						class="avatar bg-yellow"
 						src="{% static 'main_app/images/' %}{{ item.name }}.svg" 

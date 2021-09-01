@@ -2,7 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Modal from './components/Modal';
 
-function PurchasePrompt() {
+// Renders a prompt when a reward item (e.g. potion) is clicked:
+function RewardPrompt() {
   const [promptItem, setPromptItem] = React.useState({});
   // Only runs on mount:
   React.useEffect(() => {
@@ -10,40 +11,32 @@ function PurchasePrompt() {
     const rewardItems = document.querySelectorAll('.reward-item');
     rewardItems.forEach((item) => {
       item.onclick = () => {
+				const price = item.children[1].children[1].innerHTML;
         setPromptItem({
           'name': item.children[1].children[0].innerHTML,
           'imgSrc': item.children[0].src,
-          'price': item.children[1].children[1].innerHTML,
-          'id': item.id
+          'price': price,
+          'id': item.id,
         });
         halfmoon.toggleModal('reward-prompt');
       }
     });
   }, []);
 
-  // The buttons for the prompt:
-  let buttons = (
-    <div className='text-right'>
-      <button 
-        type='button' 
-        className='btn bg-gray mr-5'
-        data-dismiss='modal'
-      >
-        No
-      </button>
-      <button 
-        type='button' 
-        className='btn btn-secondary'
-        onClick={() => purchaseItem(promptItem.id)}
-        data-dismiss='modal'
-      >
-        Yes
-      </button>
-    </div>
-  );
-
+	function equipAvatar() {
+		console.log('equip');
+		console.log(promptItem.id);
+	}
+	function purchaseAvatar() {
+		console.log('purchase');
+		console.log(promptItem.id);
+	}
   // The content of the prompt:
   let content;
+	// Button for submitting the prompt:
+	let submitButton;
+	// Buttons for both submitting and dismissing:
+	let buttons;
   // The content changes based on whether the item is owned/equiped/unowned:
   if (promptItem.price == 'Owned') {
     content = (
@@ -52,6 +45,16 @@ function PurchasePrompt() {
         <div>Equip {promptItem.name}?</div>
       </div>
     );
+		submitButton = (
+      <button 
+        type='button' 
+        className='btn btn-secondary'
+        data-dismiss='modal'
+				onClick = {equipAvatar}
+      >
+        Yes
+      </button>
+		);
   } else if (promptItem.price == 'Equiped') {
     content = (
       <div id='reward-modal-content'>
@@ -71,6 +74,16 @@ function PurchasePrompt() {
       </div>
     );
   } else {
+		submitButton = (
+      <button 
+        type='button' 
+        className='btn btn-secondary'
+        data-dismiss='modal'
+				onClick = {purchaseAvatar}
+      >
+        Yes
+      </button>
+		);
     const price = (
       <span dangerouslySetInnerHTML={{__html: promptItem.price}}></span>
     );
@@ -82,10 +95,21 @@ function PurchasePrompt() {
     );
   }
 
-  function purchaseItem(id) {
-    console.log(id);
-  }
-
+	// if the button is not yet set:
+  if (!buttons) {
+		buttons = (
+			<div className='text-right'>
+				<button 
+					type='button' 
+					className='btn bg-gray mr-5'
+					data-dismiss='modal'
+				>
+					No
+				</button>
+				{submitButton}
+			</div>
+		);
+	}
 
   return (
     <Modal
@@ -97,4 +121,4 @@ function PurchasePrompt() {
   );
 }
 
-export default PurchasePrompt;
+export default RewardPrompt;
