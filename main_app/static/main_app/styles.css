@@ -97,6 +97,65 @@
 	display: block;	
 }
 
+@keyframes fadeIn {
+	from {
+		bottom: -20px;
+		opacity: 0;
+	}
+	to {
+		bottom: 50px;
+		opacity: 1;
+	}
+}
+
+#complete-popup {
+	display: none;
+	z-index: 1;
+	position: fixed;
+	margin-left: 30px;
+	padding: 10px;
+	bottom: 50px;
+	border-radius: 10px;
+	animation-name: fadeIn;
+	animation-duration: 0.5s;
+	animation-fill-mode: forwards;
+}
+
+.modal {
+	position: fixed;
+}
+
+#complete-popup .dismiss-popup {
+	cursor: pointer;
+}
+
+#complete-popup .dismiss-popup:hover {
+	color: gray;
+}
+
+.reward-item {
+	cursor: pointer;
+}
+
+body:not(.dark-mode) .reward-item:hover {
+	box-shadow: var(--lm-large-shadow);
+}
+
+.dark-mode .reward-item:hover {
+	box-shadow: var(--dm-large-shadow);
+}
+
+#reward-modal-content {
+	display: flex;
+	align-items: center;
+}
+
+#reward-modal-content img {
+	width: 70px;
+	margin-right: 8px;
+}
+
+
 /* Todo Items */
 .todo-item {
 	display: flex;
@@ -153,37 +212,4 @@
 .dark-mode .rdtCounter .rdtBtn:hover {
 	background-color: #575757;
 }
-
-@keyframes fadeIn {
-	from {
-		bottom: -20px;
-		opacity: 0;
-	}
-	to {
-		bottom: 50px;
-		opacity: 1;
-	}
-}
-
-#rewards-popup {
-	display: none;
-	z-index: 1;
-	position: fixed;
-	margin-left: 30px;
-	padding: 10px;
-	bottom: 50px;
-	border-radius: 10px;
-	animation-name: fadeIn;
-	animation-duration: 0.5s;
-	animation-fill-mode: forwards;
-}
-
-#rewards-popup .dismiss-popup {
-	cursor: pointer;
-}
-
-#rewards-popup .dismiss-popup:hover {
-	color: gray;
-}
-
 

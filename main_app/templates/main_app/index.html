@@ -46,7 +46,7 @@
 			<div class='my-5 text-center add-item'>
 				<button
 					type='button'
-					onclick='window.location.href="#add-todo-modal"'
+					onclick='halfmoon.toggleModal("add-todo-modal")'
 					class='btn bg-gray-light w-full'
 					id='add-todo-btn'
 				>
@@ -73,63 +73,34 @@
 				<i class="fas fa-coins"></i>
 			</div>
 		</div>
-		<div class="row">
-				<div class="card">
+		<div id="rewards" class="row">
+
+			{% for item in rewards_list %}
+				<div class="card reward-item">
 					<img 
-						class="avatar bg-yellow" 
-						src={% static 'main_app/images/food.svg' %} alt="Food"
+						class="avatar bg-yellow"
+						src="{% static 'main_app/images/' %}{{ item.name }}.svg" 
+						alt={{ item.id }}
 					>
 					<div class="card-body pb-5 px-10">
-						<small class="text-indigo">Food (10HP)</small>
-						<small>75 <i class="fas fa-coins"></i></small>
+						<small class="text-indigo">{{ item.text }}</small>
+						{% if item.name == user.avatar %}
+							<small>Equiped</small>
+						{% elif item in rewards_owned %}
+							<small>Owned</small>
+						{% else %}
+							<small>{{ item.price }} <i class="fas fa-coins"></i></small>
+						{% endif %}
 					</div>
 				</div>
-				<div class="card">
-					<img 
-						class="avatar" 
-						src={% static 'main_app/images/potion.svg' %} alt="Potion"
-					>
-					<div class="card-body pb-5 px-10">
-						<small class="text-indigo">Potion (40 HP)</small>
-						<small>300 <i class="fas fa-coins"></i></small>
-					</div>
-				</div>
-				<div class="card">
-					<img 
-						class="avatar" 
-						src={% static 'main_app/images/orc.svg' %} alt="Orc"
-					>
-					<div class="card-body pb-5 px-10">
-						<small class="text-indigo">Orc Avatar</small>
-						<small>500 <i class="fas fa-coins"></i></small>
-					</div>
-				</div>
-				<div class="card">
-					<img 
-						class="avatar" 
-						src={% static 'main_app/images/elf-girl.svg' %} alt="Elf"
-					>
-					<div class="card-body pb-5 px-10">
-						<small class="text-indigo">Elf Avatar</small>
-						<small>850 <i class="fas fa-coins"></i></small>
-					</div>
-				</div>
-				<div class="card">
-					<img 
-						class="avatar" 
-						src={% static 'main_app/images/grim-reaper.svg' %} alt="Reaper"
-					>
-					<div class="card-body pb-5 px-10">
-						<small class="text-indigo">Reaper Avatar</small>
-						<small>2500 <i class="fas fa-coins"></i></small>
-					</div>
-				</div>
+			{% endfor %}
+
 		</div>
 	</div>
 </div>
 
 <!-- hide pop-ups from the bottom of the page -->
-<div id="rewards-popup" class="bg-dark bg-white-lm shadow border">
+<div id="complete-popup" class="bg-dark bg-white-lm shadow border">
 	+10 exp, +30
 	<i class="fas fa-coins"></i>
 	<i class="ml-10 fas fa-times-circle dismiss-popup">
@@ -137,6 +108,6 @@
 </div>
 
 <!-- JS -->
-<script src={% static 'main_app/js/tabNav.js' %}></script>
+<script src={% static 'main_app/js/misc.js' %}></script>
 <script src={% static 'main_app/js/main.js' %}></script>
 {% endblock %}

@@ -1,12 +1,13 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-from .models import User, Todo
+from .models import User, Todo, Reward
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from datetime import datetime, timezone
 import json
+
 
 # Create your views here.
 def index(request):
@@ -15,7 +16,12 @@ def index(request):
         return render(request, "main_app/splash.html")
     # Display the task manager app if the user is logged in:
     else:
-        return render(request, "main_app/index.html")
+        # List of rewards for the user:
+        return render(request, "main_app/index.html", {
+            "rewards_list": Reward.objects.all(), 
+            "rewards_owned": request.user.rewards_owned.all()
+            })
+
 
 # Login the user:
 def login_view(request):
@@ -36,12 +42,15 @@ def login_view(request):
         else:
             return render(request, "main_app/login.html", {
                 "message": "Invalid username and/or password."
-            })
+                })
+
+
 # Logout:
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("index"))
  
+
 # Register / Sign Up
 def register(request):
     if request.method == "POST":
@@ -54,17 +63,19 @@ def register(request):
         if password != confirmation:
             return render(request, "main_app/register.html", {
                 "message": "Passwords must match."
-            })
+                })
 
         # Attempt to create new user
         try:
             user = User.objects.create_user(username=username,
                 password=password, nickname=nickname)
+            # Reward initially owned by the user:
+            user.rewards_owned.add(Reward.objects.get(name="spider"))
             user.save()
         except IntegrityError:
             return render(request, "main_app/register.html", {
                 "message": "Username already taken."
-            })
+                })
         login(request, user)
         return HttpResponseRedirect(reverse("index"))
     else:
@@ -108,7 +119,8 @@ def todos(request):
                 todo.title = data["title"]
                 todo.description = data["description"]
                 new_deadline = datetime.fromisoformat(
-                    data["deadline"].replace("Z", "+00:00"))
+                    data["deadline"].replace("Z", "+00:00")
+                    )
                 todo.deadline = new_deadline
                 todo.save()
                 return JsonResponse(todo.serialize(), status=200)
@@ -124,7 +136,8 @@ def todos(request):
         try:
             data = request.POST
             deadline = datetime.fromisoformat(
-                data["deadline"].replace("Z", "+00:00"))
+                data["deadline"].replace("Z", "+00:00")
+                )
             todo = Todo.objects.create(
                 title = data["title"],
                 description = data["description"],
@@ -138,7 +151,8 @@ def todos(request):
     todo_all = request.user.todo.all().order_by("created")
     return JsonResponse(
         [todo.serialize() for todo in todo_all],
-        safe=False, status=200)
+        safe=False, status=200
+        )
 
 @login_required
 def user_stats(request):
@@ -150,4 +164,6 @@ def user_stats(request):
         "healthCurrent": user.health_current,
         "healthMax": user.health_max,
         "expCurrent": user.exp_current,
-        "expNext": user.exp_next}, status=200)
+        "expNext": user.exp_next
+        }, status=200)
+

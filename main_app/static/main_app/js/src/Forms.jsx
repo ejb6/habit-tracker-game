@@ -62,12 +62,12 @@ function AddTodoForm({setTodoAll}) {
 
   const buttons = (
     <div className='text-right'>
-      <a href='#' className='btn btn-dark mr-5' role='button'>
+      <a className='btn btn-dark mr-5' data-dismiss='modal' role='button'>
         <i className='fas fa-times'></i>
       </a>
       <a 
-        href='#' 
         onClick={addTodoSubmit}
+        data-dismiss='modal'
         className='btn btn-secondary' 
         role='button'
       >
@@ -96,11 +96,11 @@ function EditTodoForm() {
 
   const buttons = (
     <div className='text-right'>
-      <a href='#' className='btn btn-dark mr-5' role='button'>
+      <a data-dismiss='modal' className='btn btn-dark mr-5' role='button'>
         <i className='fas fa-times'></i>
       </a>
       <a 
-        href='#' 
+        data-dismiss='modal'
         className='btn btn-danger mr-5' 
         id='delete-edit-todo'
         role='button'
@@ -108,7 +108,7 @@ function EditTodoForm() {
         <i className='far fa-trash-alt' />
       </a>
       <a 
-        href='#' 
+        data-dismiss='modal'
         id='submit-edit-todo'
         className='btn btn-secondary' 
         role='button'
@@ -131,7 +131,6 @@ function EditTodoForm() {
 // This function handles submission for editing Todos
 function editTodoSubmit(todo, setTodo, setTodoAll) {
   // The following block is used to prefill the edit form
-  console.log(todo);
   const form = document.querySelector('#edit-todo-form');
   form.querySelector('input[name="title"]').value = todo.title;
   const desc = form.querySelector('textarea[name="description"]');

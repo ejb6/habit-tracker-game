@@ -74,9 +74,10 @@ function TodoItem(props) {
           <button
             type='button'
             className='delete-item-button bg-gray'
+            data-dismiss='modal'
             onClick={() => {
               editTodoSubmit(todo, setTodo, props.setTodoAll);
-              window.location.href='#edit-todo-modal';
+              halfmoon.toggleModal('edit-todo-modal');
             }}
           >
             <i className='fas fa-pencil-alt' />

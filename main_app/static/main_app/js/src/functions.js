@@ -8,7 +8,7 @@ import csrftoken from './csrf'
 
 // Used for showing rewards received when completing a task:
 function rewardPopup() {
-	let popup = document.querySelector('#rewards-popup');
+	let popup = document.querySelector('#complete-popup');
 	popup.style.display = 'block';
 	// Dismiss popup after 4 seconds:
 	setTimeout(() => {popup.style.display = 'none'}, 4000);
