@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from datetime import timedelta
+from django.utils import timezone
 
 
 # Create your models here.
@@ -19,7 +21,7 @@ class User(AbstractUser):
     # Rewards owned for completing tasks:
     rewards_owned = models.ManyToManyField("Reward")
 
-    # This method is called when a task is completed:
+    # Called when a task is completed:
     def task_complete(self):
         self.gold += 30
         self.exp_current += 10
@@ -32,7 +34,7 @@ class User(AbstractUser):
             self.health_current += 5
         self.save()
 
-    # This method is called when a task is marked as incompleted:
+    # Called when a task is marked as incompleted:
     def task_incomplete(self):
         self.gold -= 30
         self.exp_current -= 10
@@ -45,11 +47,33 @@ class User(AbstractUser):
             self.health_current -= 5
         self.save()
 
-    # This method is used to increase the current health:
+    # Used to increase the current health:
     def increase_hp(self, amount):
         self.health_current += amount
         if self.health_current >= self.health_max:
             self.health_current = self.health_max
+        self.save()
+
+    # The following is used to determine when to run decrease_hp()
+    hp_last_decreased = models.DateTimeField(auto_now_add=True)
+    # Used to decrease the current health:
+    def decrease_hp(self):
+        # This method only runs once per day at max:
+        timedelta_last = self.hp_last_decreased - timezone.now()
+        if timedelta_last < timedelta(days=1):
+            return None
+        # multiplier is used to account for timedelta_last > 1 day
+        multiplier = round(timedelta_last / timedelta(days=1))
+        # The deduction is based on overdue tasks
+        for todo_item in self.todo.all():
+            # Skip if the todo is completed or is not past deadline
+            if (
+                todo_item.completed or
+                todo_item.deadline > timezone.now()
+            ):
+                continue
+            self.health_current -= 4 * multiplier
+        self.hp_last_decreased = timezone.now()
         self.save()
 
 

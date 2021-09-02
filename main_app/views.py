@@ -16,6 +16,8 @@ def index(request):
         return render(request, 'main_app/splash.html')
     # Display the task manager app if the user is logged in:
     else:
+        # Calculates HP deductions on login:
+        request.user.decrease_hp()
         # List of rewards for the user:
         return render(request, 'main_app/index.html', {
             'rewards_list': Reward.objects.all(), 
