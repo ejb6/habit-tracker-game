@@ -1,13 +1,17 @@
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// This file is used for reward item prompts
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Modal from './components/Modal';
+import {equipAvatar, purchaseAvatar} from './functions';
 
 // Renders a prompt when a reward item (e.g. potion) is clicked:
 function RewardPrompt() {
   const [promptItem, setPromptItem] = React.useState({});
   // Only runs on mount:
   React.useEffect(() => {
-    // For purchasing rewards:
+		// Adds an event listener for all reward items:
     const rewardItems = document.querySelectorAll('.reward-item');
     rewardItems.forEach((item) => {
       item.onclick = () => {
@@ -22,22 +26,13 @@ function RewardPrompt() {
       }
     });
   }, []);
-
-	function equipAvatar() {
-		console.log('equip');
-		console.log(promptItem.id);
-	}
-	function purchaseAvatar() {
-		console.log('purchase');
-		console.log(promptItem.id);
-	}
   // The content of the prompt:
   let content;
 	// Button for submitting the prompt:
 	let submitButton;
 	// Buttons for both submitting and dismissing:
 	let buttons;
-  // The content changes based on whether the item is owned/equiped/unowned:
+  // The content changes based on whether the item is owned/equiped
   if (promptItem.price == 'Owned') {
     content = (
       <div id='reward-modal-content'>
@@ -50,7 +45,7 @@ function RewardPrompt() {
         type='button' 
         className='btn btn-secondary'
         data-dismiss='modal'
-				onClick = {equipAvatar}
+				onClick = {() => equipAvatar(promptItem.id)}
       >
         Yes
       </button>
@@ -79,7 +74,7 @@ function RewardPrompt() {
         type='button' 
         className='btn btn-secondary'
         data-dismiss='modal'
-				onClick = {purchaseAvatar}
+				onClick = {() => purchaseAvatar(promptItem.id)}
       >
         Yes
       </button>
@@ -94,9 +89,9 @@ function RewardPrompt() {
       </div>
     );
   }
-
 	// if the button is not yet set:
   if (!buttons) {
+		// for equiping/purchasing
 		buttons = (
 			<div className='text-right'>
 				<button 
@@ -110,7 +105,7 @@ function RewardPrompt() {
 			</div>
 		);
 	}
-
+	// Returns a modal
   return (
     <Modal
       modalId='reward-prompt'

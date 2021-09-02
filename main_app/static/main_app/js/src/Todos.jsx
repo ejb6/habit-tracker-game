@@ -5,8 +5,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 // CSRF token for Django:
 import csrftoken from './csrf';
-import timeRemain from './timeRemain';
-import {markTodo, deleteTodo} from './functions';
+import {timeRemain, markTodo, deleteTodo} from './functions';
 import {AddTodoForm, EditTodoForm, editTodoSubmit} from './Forms';
 
 // A single todo item:
