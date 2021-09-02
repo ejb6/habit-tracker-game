@@ -12,8 +12,8 @@ This is an RPG habit tracker/task manager similar to Habitica (in progress).
 - [x] Rewards Functionality
   - [x] Show a reward pop-up when completing tasks
   - [x] Ability to purchase
-- [ ] Health deduction on overdue tasks (In Progress)
-- [ ] Habit Functionality
+- [ ] Health deduction on overdue tasks (to be confirmed)
+- [ ] Habit Functionality (In Progress)
 - [ ] Dailies Functionality
 - [ ] Error checking
 
