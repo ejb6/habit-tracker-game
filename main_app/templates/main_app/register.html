@@ -13,19 +13,19 @@
 		<h3 class="fw-normal">Create an Account</h3>
 		<div class="mb-5">
 			<label for="floatingInput">Username</label>
-			<input type="text" name="username" class="form-control" id="floatingInput" placeholder="username">
+			<input type="text" name="username" class="form-control" id="floatingInput" placeholder="username" required>
 		</div>
 		<div class="mb-5">
 			<label for="floatingInput">Nickname</label>
-			<input type="text" name="nickname" class="form-control" id="floatingInput" placeholder="Nickname" maxlength="10">
+			<input type="text" name="nickname" class="form-control" id="floatingInput" placeholder="Nickname" maxlength="10" required>
 		</div>
 		<div class="mb-5">
 			<label for="floatingPassword">Password</label>
-			<input type="password" class="form-control" name="password" id="floatingPassword" placeholder="Password">
+			<input type="password" class="form-control" name="password" id="floatingPassword" placeholder="Password" required>
 		</div>
 		<div class="mb-10">
 			<label for="floatingPassword">Confirm Password</label>
-			<input type="password" class="form-control" name="confirmation" id="floatingPassword" placeholder="Password">
+			<input type="password" class="form-control" name="confirmation" id="floatingPassword" placeholder="Password" required>
 		</div>
 		{% csrf_token %}
 		<button class="w-100 btn btn-lg btn-secondary text-white" type="submit">Sign Up</button>

@@ -12,7 +12,12 @@ urlpatterns = [
         'equip_avatar/<str:avatar_name>',
         views.equip_avatar,
         name='equip_avatar'
-        ),
+    ),
+    path(
+        'purchase/<str:reward_name>',
+        views.purchase,
+        name='purchase'
+    ),
 ]
 
 

@@ -6,6 +6,7 @@ import csrftoken from './csrf'
 // marking a todo as completed etc.
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+// Used to pop-up an alert:
 function modalAlert(text) {
 	alert(text);
 }
@@ -66,7 +67,7 @@ function markTodo(action, todoId, setTodo, fetchStats) {
 	}).then((response) => {
 		if (!response.ok) {
 			// If something is wrong
-			response.text().then((text) => alert(text));
+			response.text().then((text) => modalAlert(text));
 		} else {
 			fetchStats();
 			// Update the todo element:
@@ -97,7 +98,7 @@ function deleteTodo(id, setTodoAll) {
 				return todoAll.filter((todo) => todo.id !== id)
 			});
 		} else {
-			response.text().then((text) => alert(text));
+			response.text().then((text) => modalAlert(text));
 		}
 	});
 }
@@ -118,9 +119,16 @@ function equipAvatar(id) {
 
 // Used to purchase a reward:
 function purchaseAvatar(id) {
-	console.log('purchase');
-	console.log(id);
+	fetch('/purchase/' + id)
+		.then(response => {
+			if (response.ok) {
+				window.location.reload(true);
+			} else {
+				response.text().then(text => modalAlert(text));
+			}
+		});
 }
+
 
 export {
 	timeRemain,

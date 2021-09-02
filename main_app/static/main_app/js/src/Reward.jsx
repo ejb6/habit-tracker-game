@@ -44,7 +44,6 @@ function RewardPrompt() {
       <button 
         type='button' 
         className='btn btn-secondary'
-        data-dismiss='modal'
 				onClick = {() => equipAvatar(promptItem.id)}
       >
         Yes
@@ -73,7 +72,6 @@ function RewardPrompt() {
       <button 
         type='button' 
         className='btn btn-secondary'
-        data-dismiss='modal'
 				onClick = {() => purchaseAvatar(promptItem.id)}
       >
         Yes

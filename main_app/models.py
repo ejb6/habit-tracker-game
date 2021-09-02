@@ -45,6 +45,13 @@ class User(AbstractUser):
             self.health_current -= 5
         self.save()
 
+    # This method is used to increase the current health:
+    def increase_hp(self, amount):
+        self.health_current += amount
+        if self.health_current >= self.health_max:
+            self.health_current = self.health_max
+        self.save()
+
 
 # A task that can be completed only once:
 class Todo(models.Model):

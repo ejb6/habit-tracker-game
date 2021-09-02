@@ -13,11 +13,11 @@
 		<h1 class="fw-normal">Please login</h1>
 		<div class="mb-5">
 			<label for="floatingInput">Username</label>
-			<input type="text" class="form-control" id="floatingInput" placeholder="Username" name="username">
+			<input type="text" class="form-control" id="floatingInput" placeholder="Username" name="username" required>
 		</div>
 		<div class="mb-10">
 			<label for="floatingPassword">Password</label>
-			<input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password">
+			<input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password" required>
 		</div>
 		{% csrf_token %}
 		<button class="btn btn-lg btn-secondary" type="submit">Login</button>

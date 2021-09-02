@@ -20,7 +20,7 @@ def index(request):
         return render(request, 'main_app/index.html', {
             'rewards_list': Reward.objects.all(), 
             'rewards_owned': request.user.rewards_owned.all()
-            })
+        })
 
 
 # Login the user:
@@ -32,8 +32,11 @@ def login_view(request):
         # Attempt to sign user in
         username = request.POST['username']
         password = request.POST['password']
-        user = authenticate(request, username=username,
-            password=password)
+        user = authenticate(
+            request,
+            username=username,
+            password=password
+        )
 
         # Check if authentication successful
         if user is not None:
@@ -42,7 +45,7 @@ def login_view(request):
         else:
             return render(request, 'main_app/login.html', {
                 'message': 'Invalid username and/or password.'
-                })
+            })
 
 
 # Logout:
@@ -63,7 +66,7 @@ def register(request):
         if password != confirmation:
             return render(request, 'main_app/register.html', {
                 'message': 'Passwords must match.'
-                })
+            })
 
         # Attempt to create new user
         try:
@@ -75,7 +78,7 @@ def register(request):
         except IntegrityError:
             return render(request, 'main_app/register.html', {
                 'message': 'Username already taken.'
-                })
+            })
         login(request, user)
         return HttpResponseRedirect(reverse('index'))
     else:
@@ -120,7 +123,7 @@ def todos(request):
                 todo.description = data['description']
                 new_deadline = datetime.fromisoformat(
                     data['deadline'].replace('Z', '+00:00')
-                    )
+                )
                 todo.deadline = new_deadline
                 todo.save()
                 return JsonResponse(todo.serialize(), status=200)
@@ -137,7 +140,7 @@ def todos(request):
             data = request.POST
             deadline = datetime.fromisoformat(
                 data['deadline'].replace('Z', '+00:00')
-                )
+            )
             todo = Todo.objects.create(
                 title = data['title'],
                 description = data['description'],
@@ -152,7 +155,7 @@ def todos(request):
     return JsonResponse(
         [todo.serialize() for todo in todo_all],
         safe=False, status=200
-        )
+    )
 
 @login_required
 def user_stats(request):
@@ -165,10 +168,10 @@ def user_stats(request):
         'healthMax': user.health_max,
         'expCurrent': user.exp_current,
         'expNext': user.exp_next
-        }, status=200)
+    }, status=200)
 
 
-# For changing profile picture:
+# For changing profile picture/avatar:
 @login_required
 def equip_avatar(request, avatar_name):
     try:
@@ -179,3 +182,28 @@ def equip_avatar(request, avatar_name):
         return HttpResponse('Success', status=200)
     except:
         return HttpResponse('Reward item is not owned', status=400)
+
+
+#
+@login_required
+def purchase(request, reward_name):
+    user = request.user
+    try:
+        reward = Reward.objects.get(name=reward_name)
+    except:
+        return HttpResponse('Reward item not found', status=404)
+    if reward.price > user.gold:
+        return HttpResponse('Insufficient gold', status=400)
+    elif reward.name == 'food' or reward.name == 'potion':
+        if reward.name == 'food':
+            hp_increase = 10
+        else:
+            hp_increase = 40
+        user.increase_hp(hp_increase)
+        return HttpResponse('HP restored!', status=200)
+
+    # else (for purchasing avatars):
+    user.gold -= reward.price
+    user.rewards_owned.add(reward)
+    user.save()
+    return HttpResponse('Avatar purchased', status=200)
