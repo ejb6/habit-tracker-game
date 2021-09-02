@@ -9,11 +9,13 @@ This is an RPG habit tracker/task manager similar to Habitica (in progress).
 - [x] Todo Functionality
 - [x] Dark Mode using Halfmoon Framework
 - [x] Status Bars (Health, Exp) using React
-- [ ] Rewards Functionality (In Progress)
+- [x] Rewards Functionality
   - [x] Show a reward pop-up when completing tasks
-  - [ ] Ability to purchase
+  - [x] Ability to purchase
+- [ ] Health deduction on overdue tasks (In Progress)
 - [ ] Habit Functionality
 - [ ] Dailies Functionality
+- [ ] Error checking
 
 ## Sample
 ![image](https://user-images.githubusercontent.com/76241888/131663662-6f3c42d0-181c-4402-9bbe-398e366e5d6c.png)
