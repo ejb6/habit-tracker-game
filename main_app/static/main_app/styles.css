@@ -155,22 +155,21 @@ body:not(.dark-mode) .reward-item:hover {
 	margin-right: 8px;
 }
 
-
-/* Todo Items */
-.todo-item {
+/* Task Items */
+.task-item {
 	display: flex;
 	background-color: #dfdfdf;
 }
 
-.dark-mode .todo-item {
+.dark-mode .task-item {
 	background-color: #444;
 }
 
-.todo-item .todo-title {
+.task-item .task-title {
 	flex-grow: 1;
 }
 
-.todo-item button {
+.task-item button {
 	border-radius: 0;
 	border: 0;
 	outline: 0;

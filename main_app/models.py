@@ -3,11 +3,31 @@ from django.contrib.auth.models import AbstractUser
 from datetime import timedelta
 from django.utils import timezone
 
+# Todos
+# Create a dailies model
+# Handle the dailies using JS
+#   - JS should check wether a deadline is missed
+#   - Deadline should change when a task is complete
+# Calculate deduction on login using JS
+# for all tasks:
+#   if last checked was tody:
+#       skip
+#   if deadline < now:
+#       deduct (send to django)
+#       update last checked for this task
+
+# Reward for completing tasks:
+class Reward(models.Model):
+    name = models.CharField(max_length=15, unique=True)
+    text = models.TextField(max_length=15)
+    price = models.IntegerField()
+
 
 # Create your models here.
 class User(AbstractUser):
     nickname = models.CharField(max_length=16)
     todo = models.ManyToManyField("Todo")
+    habits = models.ManyToManyField("Habit")
     # Player Stats:
     level = models.IntegerField(default=1)
     health_current = models.IntegerField(default=50)
@@ -53,27 +73,20 @@ class User(AbstractUser):
         if self.health_current >= self.health_max:
             self.health_current = self.health_max
         self.save()
-
-    # The following is used to determine when to run decrease_hp()
-    hp_last_decreased = models.DateTimeField(auto_now_add=True)
-    # Used to decrease the current health:
-    def decrease_hp(self):
-        # This method only runs once per day at max:
-        timedelta_last = self.hp_last_decreased - timezone.now()
-        if timedelta_last < timedelta(days=1):
-            return None
-        # multiplier is used to account for timedelta_last > 1 day
-        multiplier = round(timedelta_last / timedelta(days=1))
-        # The deduction is based on overdue tasks
-        for todo_item in self.todo.all():
-            # Skip if the todo is completed or is not past deadline
-            if (
-                todo_item.completed or
-                todo_item.deadline > timezone.now()
-            ):
-                continue
-            self.health_current -= 4 * multiplier
-        self.hp_last_decreased = timezone.now()
+    
+    def decrease_hp(self, amount):
+        self.health_current -= amount
+        if self.health_current <= 0:
+            # Return the user to level 1:
+            self.exp_current = 0
+            self.health_current = 50
+            self.health_max = 50
+            self.exp_current = 100
+            self.exp_next = 100
+            self.level = 1
+            self.rewards_owned = None
+            self.rewards_owned.add(Reward.objects.get(name='spider'))
+            self.avatar = 'spider'
         self.save()
 
 
@@ -93,11 +106,20 @@ class Todo(models.Model):
             "created": self.created,
             "deadline": self.deadline,
             "completed": self.completed
-            }
+        }
 
+class Habit(models.Model):
+    title = models.CharField(max_length=30)
+    # A habit can be either good or bad
+    is_bad = models.BooleanField(default=False)
+    last_checked = models.DateTimeField(auto_now_add=True)
+    streak = models.IntegerField(default=0)
 
-# Reward for completing tasks:
-class Reward(models.Model):
-    name = models.CharField(max_length=15, unique=True)
-    text = models.TextField(max_length=15)
-    price = models.IntegerField()
+    def serialize(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "isBad": self.is_bad,
+            "lastChecked": self.last_checked,
+            "streak": self.streak
+        }

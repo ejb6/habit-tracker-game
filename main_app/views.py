@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-from .models import User, Todo, Reward
+from .models import User, Todo, Habit, Reward
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
@@ -16,8 +16,6 @@ def index(request):
         return render(request, 'main_app/splash.html')
     # Display the task manager app if the user is logged in:
     else:
-        # Calculates HP deductions on login:
-        request.user.decrease_hp()
         # List of rewards for the user:
         return render(request, 'main_app/index.html', {
             'rewards_list': Reward.objects.all(), 
@@ -102,7 +100,7 @@ def todos(request):
 
         # Mark Todo as completed:
         if data['action'] == 'mark':
-            todo.completed = datetime.now(timezone.utc)
+            todo.completed = timezone.now()
             todo.save()
             request.user.task_complete()
 
@@ -146,7 +144,8 @@ def todos(request):
             todo = Todo.objects.create(
                 title = data['title'],
                 description = data['description'],
-                deadline = deadline)
+                deadline = deadline
+            )
             request.user.todo.add(todo)
             return JsonResponse(todo.serialize(), status=201)
         except:
@@ -209,3 +208,21 @@ def purchase(request, reward_name):
     user.rewards_owned.add(reward)
     user.save()
     return HttpResponse('Avatar purchased', status=200)
+
+
+@login_required
+def habits(request):
+    if request.method == 'PUT':
+        data = json.loads(request.body)
+        try:
+            habit = Habit.objects.get(name=data['name'])
+            habit.streak += 1
+            habit.last_checked = timezone.now()
+            habit.save()
+        except:
+            return HttpResponse('Habit object not found', status=404)
+    habits = request.user.habits.all()
+    return JsonResponse(
+        [habit.serialize() for habit in habits],
+        safe=False, status=200
+    )

@@ -9,7 +9,6 @@
 		<!-- Profile Banner -->
 		<div id="profile_banner" class="my-5">
 			<!-- Profile Avatar -->
-
 			<img 
 				class="avatar mr-15" 
 				src="{% static 'main_app/images/' %}{{ user.avatar }}.svg" 
@@ -40,6 +39,7 @@
 				Dailies
 			</button>
 		</div>
+
 		<!-- Tab Contents -->
 		<div id="todos" class="tabcontent">
 			<!-- Button for adding a todo -->
@@ -54,15 +54,45 @@
 					Add a Todo
 				</button>
 			</div>
-
 			<div id="todo-items">
 				<!-- To be filled using react -->
 			</div>
 		</div>
-		<div id="habits" class="tabcontent">Habits</div>
-		<div id="dailies" class="tabcontent">Dailies</div>
-		
+		<div id="habits" class="tabcontent">
+			<!-- Button for adding a habit -->
+			<div class='my-5 text-center add-item'>
+				<button
+					type='button'
+					onclick='halfmoon.toggleModal("add-habit-modal")'
+					class='btn bg-gray-light w-full'
+					id='add-habit-btn'
+				>
+					<i class='far fa-plus-square'></i>
+					Add a Habit
+				</button>
+			</div>
+			<div id="habit-items">
+				<!-- To be filled using react -->
+			</div>
+		</div>
+		<div id="dailies" class="tabcontent">
+			<!-- Button for adding a habit -->
+			<div class='my-5 text-center add-item'>
+				<button
+					type='button'
+					class='btn bg-gray-light w-full'
+					id='add-dailies-btn'
+				>
+					<i class='far fa-plus-square'></i>
+					Add a Daily Task
+				</button>
+			</div>
+			<div id="dailies-items">
+				<!-- To be filled using react -->
+			</div>
+		</div>
 	</div>
+
 	<!-- Column 2 -->
 	<div class="col-sm-4 col-lg-5 border-left px-10">
 		<h3>Rewards</h3>

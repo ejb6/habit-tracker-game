@@ -3,25 +3,22 @@
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 import React from 'react';
 import ReactDOM from 'react-dom';
+import PropTypes from 'prop-types';
 // CSRF token for Django:
-import csrftoken from './csrf';
-import {timeRemain, markTodo, deleteTodo} from './functions';
-import {AddTodoForm, EditTodoForm, editTodoSubmit} from './Forms';
+import { timeRemain, markTodo, deleteTodo } from './functions';
+import { AddTodoForm, editTodoSubmit } from './Forms';
 
 // A single todo item:
-function TodoItem(props) {
-  const [todo, setTodo] = React.useState(props.todo);
-
-  // The following ID is for editing a todo item:
-  const editTodoButtonId = 'edit-todo-button-' + todo.id;
+function TodoItem({ todoInput, fetchStats, setTodoAll }) {
+  const [todo, setTodo] = React.useState(todoInput);
   // Classes of some element changes based on task completion
   // The div element for a single Todo item (buttons included):
   return (
     <div
       id={`todo${todo.id}`}
       className={todo.completed
-        ? 'todo-item border-bottom mb-5 completed'
-        : 'todo-item border-bottom mb-5'}
+        ? 'task-item border-bottom mb-5 completed'
+        : 'task-item border-bottom mb-5'}
     >
       {todo.completed
         ? (
@@ -29,7 +26,7 @@ function TodoItem(props) {
             type='button'
             className='bg-secondary mr-10 mark'
             onClick={() => {
-              markTodo('unmark', todo.id, setTodo, props.fetchStats);
+              markTodo('unmark', todo.id, setTodo, fetchStats);
             }}
           >
             <i className='fas fa-check-square' />
@@ -40,17 +37,17 @@ function TodoItem(props) {
             type='button'
             className='bg-warning mr-10 mark'
             onClick={() => {
-              markTodo('mark', todo.id, setTodo, props.fetchStats);
+              markTodo('mark', todo.id, setTodo, fetchStats);
             }}
           >
             <i className='far fa-check-square' />
           </button>
         )}
-      <div className='py-5 overflow-hide todo-title'>
+      <div className='py-5 overflow-hide task-title'>
         <div>
           {todo.title}
         </div>
-        <small className='todo-desc text-teal'>
+        <small className='text-teal'>
           <span>
             {timeRemain(todo.deadline)}
           </span>
@@ -64,7 +61,7 @@ function TodoItem(props) {
           <button
             type='button'
             className='delete-item-button bg-gray'
-            onClick={() => deleteTodo(todo.id, props.setTodoAll)}
+            onClick={() => deleteTodo(todo.id, setTodoAll)}
           >
             <i className='far fa-trash-alt' />
           </button>
@@ -75,7 +72,8 @@ function TodoItem(props) {
             className='delete-item-button bg-gray'
             data-dismiss='modal'
             onClick={() => {
-              editTodoSubmit(todo, setTodo, props.setTodoAll);
+              editTodoSubmit(todo, setTodo, setTodoAll);
+              // eslint-disable-next-line no-undef
               halfmoon.toggleModal('edit-todo-modal');
             }}
           >
@@ -86,22 +84,38 @@ function TodoItem(props) {
   );
 }
 
+TodoItem.propTypes = {
+  todoInput: PropTypes.shape({
+    id: PropTypes.number,
+    title: PropTypes.string,
+    deadline: PropTypes.string,
+    completed: PropTypes.string,
+  }),
+  fetchStats: PropTypes.func,
+  setTodoAll: PropTypes.func,
+};
+
+TodoItem.defaultProps = {
+  todoInput: {
+    id: 0,
+    title: 'Sample Todo',
+    deadline: '',
+    completed: '',
+  },
+  fetchStats: () => {},
+  setTodoAll: () => {},
+};
 
 // Used to display all of the todo items together:
-function Todos({fetchStats}) {
+function Todos({ fetchStats }) {
   const [todoAll, setTodoAll] = React.useState([]);
-
-  // Delete Todo 
-  const deleteTodoLocal = (todo_id) => {
-    deleteTodo(todo_id, setTodoAll);
-  }
 
   // This only runs on mount (does not run on state update);
   React.useEffect(() => {
     // Render the form for adding todos:
     ReactDOM.render(
-      <AddTodoForm setTodoAll={setTodoAll} />, 
-      document.querySelector('#add-todo')
+      <AddTodoForm setTodoAll={setTodoAll} />,
+      document.querySelector('#add-todo'),
     );
 
     // Fetch all todos from Django:
@@ -119,7 +133,7 @@ function Todos({fetchStats}) {
       {todoAll.map((todo) => (
         <TodoItem
           key={todo.id}
-          todo={todo}
+          todoInput={todo}
           setTodoAll={setTodoAll}
           fetchStats={fetchStats}
         />
@@ -127,5 +141,12 @@ function Todos({fetchStats}) {
     </div>
   );
 }
+
+Todos.propTypes = {
+  fetchStats: PropTypes.func,
+};
+Todos.defaultProps = {
+  fetchStats: () => {},
+};
 
 export default Todos;

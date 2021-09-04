@@ -1,35 +1,51 @@
-import Modal from './components/Modal';
+/* eslint-disable jsx-a11y/label-has-associated-control */
 import React from 'react';
-import ReactDOM from 'react-dom';
+import PropTypes from 'prop-types';
 // Datetime Picker for setting deadlines:
 import Datetime from 'react-datetime';
+import Modal from './components/Modal';
 import 'react-datetime/css/react-datetime.css';
 // CSRF token for Django
 import csrftoken from './csrf';
-import {deleteTodo} from './functions';
+import { deleteTodo, modalAlert } from './functions';
 
-function TodoForm({formId})   {
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// Todos: line 14 - 190
+function TodoForm({ formId }) {
   return (
     <form id={formId}>
       <div className='mb-5'>
-        <label>Title</label>
-        <input type='text' className='form-control' placeholder='Title' name='title' />
+        <label className='w-full'>
+          Title
+          <input type='text' className='form-control' placeholder='Title' name='title' />
+        </label>
       </div>
       <div className='mb-5'>
-        <label>Description</label>
-        <textarea className='form-control' placeholder='Description' name='description' />
+        <label className='w-full'>
+          Description
+          <textarea className='form-control' placeholder='Description' name='description' />
+        </label>
       </div>
       <div className='mb-5'>
-        <label>Deadline</label>
-        <Datetime 
-          inputProps={{'name': 'deadline', 'placeholder': 'Deadline'}}
-        />
+        <label className='w-full'>
+          Deadline
+          <Datetime
+            inputProps={{ name: 'deadline', placeholder: 'Deadline' }}
+          />
+        </label>
       </div>
     </form>
   );
 }
 
-function AddTodoForm({setTodoAll}) {
+TodoForm.propTypes = {
+  formId: PropTypes.string,
+};
+TodoForm.defaultProps = {
+  formId: 'form-default',
+};
+
+function AddTodoForm({ setTodoAll }) {
   // Used for handling form submission for adding a Todo
   function addTodoSubmit() {
     const formElement = document.querySelector('#add-todo-form');
@@ -43,89 +59,94 @@ function AddTodoForm({setTodoAll}) {
     }).then((response) => {
       if (response.ok) {
         response.json().then((newTodo) => {
-          setTodoAll(todoAllCurrent => {
-            return [...todoAllCurrent, newTodo]
-          });
+          setTodoAll((todoAllCurrent) => [...todoAllCurrent, newTodo]);
         });
       } else {
-        alert('Something is wrong');
+        modalAlert('Something is wrong');
       }
     });
     formElement.reset();
   }
 
   const formApp = (
-    <TodoForm 
-      formId='add-todo-form' 
+    <TodoForm
+      formId='add-todo-form'
     />
   );
 
   const buttons = (
     <div className='text-right'>
-      <a className='btn btn-dark mr-5' data-dismiss='modal' role='button'>
-        <i className='fas fa-times'></i>
-      </a>
-      <a 
+      <button className='btn btn-dark mr-5' data-dismiss='modal' type='button'>
+        <i className='fas fa-times' />
+      </button>
+      <button
         onClick={addTodoSubmit}
         data-dismiss='modal'
-        className='btn btn-secondary' 
-        role='button'
+        className='btn btn-secondary'
+        type='button'
       >
         Save
-      </a>
+      </button>
     </div>
   );
 
   return (
-    <Modal 
+    <Modal
       modalId='add-todo-modal'
-      title='Add a Todo' 
+      title='Add a Todo'
       content={formApp}
       buttons={buttons}
     />
-  )
+  );
 }
+
+AddTodoForm.propTypes = {
+  setTodoAll: PropTypes.func,
+};
+AddTodoForm.defaultProps = {
+  setTodoAll: () => {},
+};
 
 // Renders a Modal Form for editing a Todo item:
 function EditTodoForm() {
   const formApp = (
-    <TodoForm 
-      formId='edit-todo-form' 
+    <TodoForm
+      formId='edit-todo-form'
     />
   );
 
   const buttons = (
     <div className='text-right'>
-      <a data-dismiss='modal' className='btn btn-dark mr-5' role='button'>
-        <i className='fas fa-times'></i>
-      </a>
-      <a 
+      <button data-dismiss='modal' className='btn btn-dark mr-5' type='button'>
+        <i className='fas fa-times' />
+      </button>
+      <button
         data-dismiss='modal'
-        className='btn btn-danger mr-5' 
+        className='btn btn-danger mr-5'
         id='delete-edit-todo'
-        role='button'
+        type='button'
       >
         <i className='far fa-trash-alt' />
-      </a>
-      <a 
+      </button>
+      <button
         data-dismiss='modal'
         id='submit-edit-todo'
-        className='btn btn-secondary' 
-        role='button'
+        className='btn btn-secondary'
+        type='button'
       >
         Save
-      </a>
+      </button>
     </div>
   );
 
   return (
-    <Modal 
+    <Modal
       modalId='edit-todo-modal'
-      title='Edit a Todo' 
+      title='Edit a Todo'
       content={formApp}
       buttons={buttons}
     />
-  )
+  );
 }
 
 // This function handles submission for editing Todos
@@ -150,7 +171,7 @@ function editTodoSubmit(todo, setTodo, setTodoAll) {
     deadlineDate = new Date(formData.get('deadline'));
     formData.set('deadline', deadlineDate.toISOString());
     // Used to tell Django that the 'action' is to edit a Todo:
-    const dataObject = { action: 'edit' , id: todo.id};
+    const dataObject = { action: 'edit', id: todo.id };
     formData.forEach((value, key) => {
       dataObject[key] = value;
     });
@@ -160,7 +181,7 @@ function editTodoSubmit(todo, setTodo, setTodoAll) {
       body: JSON.stringify(dataObject),
     }).then((response) => {
       if (!response.ok) {
-        response.text().then((text) => alert(text));
+        response.text().then((text) => modalAlert(text));
       } else {
         response.json().then((json) => setTodo(json));
       }
@@ -168,4 +189,57 @@ function editTodoSubmit(todo, setTodo, setTodoAll) {
   };
 }
 
-export {AddTodoForm, EditTodoForm, editTodoSubmit};
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// Habits: line 193 -
+function HabitForm({ formId }) {
+  return (
+    <form id={formId}>
+      <div className='mb-5'>
+        <label className='w-full'>
+          Title
+          <input type='text' className='form-control' placeholder='Title' name='title' />
+        </label>
+      </div>
+      <div className='mb-5'>
+        <label className='w-full'>
+          Description
+          <textarea className='form-control' placeholder='Description' name='description' />
+        </label>
+      </div>
+      <div className='mb-5'>
+        <label className='w-full'>
+          Good Habit
+          <input type='radio' className='form-control' name='habit-type' />
+        </label>
+        <label className='w-full'>
+          Bad Habit
+          <input type='radio' className='form-control' name='habit-type' />
+        </label>
+      </div>
+    </form>
+  );
+}
+
+HabitForm.propTypes = {
+  formId: PropTypes.string,
+};
+HabitForm.defaultProps = {
+  formId: 'default-form-id',
+};
+
+function AddHabitForm() {
+  return (
+    <Modal
+      modalId='add-habit-modal'
+      title='Add a Habit'
+      content={<HabitForm formId='add-habit-form' />}
+    />
+  );
+}
+
+export {
+  AddTodoForm,
+  EditTodoForm,
+  editTodoSubmit,
+  AddHabitForm,
+};
