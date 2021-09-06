@@ -110,6 +110,7 @@ class Todo(models.Model):
 
 class Habit(models.Model):
     title = models.CharField(max_length=30)
+    description = models.CharField(max_length=150, default='')
     # A habit can be either good or bad
     is_bad = models.BooleanField(default=False)
     last_checked = models.DateTimeField(auto_now_add=True)
@@ -119,6 +120,7 @@ class Habit(models.Model):
         return {
             "id": self.id,
             "title": self.title,
+            "desc": self.description,
             "isBad": self.is_bad,
             "lastChecked": self.last_checked,
             "streak": self.streak

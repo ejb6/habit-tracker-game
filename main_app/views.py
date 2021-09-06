@@ -5,7 +5,8 @@ from .models import User, Todo, Habit, Reward
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
-from datetime import datetime, timezone
+from datetime import datetime
+from django.utils import timezone
 import json
 
 
@@ -215,12 +216,56 @@ def habits(request):
     if request.method == 'PUT':
         data = json.loads(request.body)
         try:
-            habit = Habit.objects.get(name=data['name'])
+            habit = request.user.habits.get(id=data['id'])
+        except:
+            return HttpResponse('Habit object not found', status=404)
+        if data['action'] == 'mark':
             habit.streak += 1
             habit.last_checked = timezone.now()
             habit.save()
+            return HttpResponse('Marked', status=200)
+        elif data['action'] == 'reset':
+            habit.streak = 0
+            habit.last_checked = timezone.now()
+            habit.save()
+            return HttpResponse('Reset', status=200)
+        elif data['action'] == 'edit':
+            try:
+                if data['habit-type'] == 'bad':
+                    is_bad = True
+                else:
+                    is_bad = False
+                habit.title = data['title']
+                habit.description = data['description']
+                habit.is_bad = is_bad
+                habit.streak = int(data['streak'])
+                habit.save()
+                print(habit.serialize())
+                return JsonResponse(habit.serialize(), status=200)
+            except:
+                return HttpResponse('Failed', status=400)
+
+    elif request.method == 'POST':
+        data = request.POST
+        try:
+            if data['habit-type'] == 'bad':
+                isBad = True
+            else:
+                isBad = False
+            if data['streak']:
+                streak = data['streak']
+            else:
+                streak = 0
+            habit = Habit.objects.create(
+                title=data['title'],
+                description=data['description'],
+                is_bad=isBad,
+                streak=streak
+            )
+            request.user.habits.add(habit)
+            return JsonResponse(habit.serialize(), status=200)
         except:
-            return HttpResponse('Habit object not found', status=404)
+            return HttpResponse('Failed to create habit item', status=400)
     habits = request.user.habits.all()
     return JsonResponse(
         [habit.serialize() for habit in habits],

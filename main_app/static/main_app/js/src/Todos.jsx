@@ -90,20 +90,9 @@ TodoItem.propTypes = {
     title: PropTypes.string,
     deadline: PropTypes.string,
     completed: PropTypes.string,
-  }),
-  fetchStats: PropTypes.func,
-  setTodoAll: PropTypes.func,
-};
-
-TodoItem.defaultProps = {
-  todoInput: {
-    id: 0,
-    title: 'Sample Todo',
-    deadline: '',
-    completed: '',
-  },
-  fetchStats: () => {},
-  setTodoAll: () => {},
+  }).isRequired,
+  fetchStats: PropTypes.func.isRequired,
+  setTodoAll: PropTypes.func.isRequired,
 };
 
 // Used to display all of the todo items together:
@@ -143,10 +132,7 @@ function Todos({ fetchStats }) {
 }
 
 Todos.propTypes = {
-  fetchStats: PropTypes.func,
-};
-Todos.defaultProps = {
-  fetchStats: () => {},
+  fetchStats: PropTypes.func.isRequired,
 };
 
 export default Todos;

@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
 import React from 'react';
 import PropTypes from 'prop-types';
 // Datetime Picker for setting deadlines:
@@ -7,7 +6,9 @@ import Modal from './components/Modal';
 import 'react-datetime/css/react-datetime.css';
 // CSRF token for Django
 import csrftoken from './csrf';
-import { deleteTodo, modalAlert } from './functions';
+import {
+  deleteTodo, modalAlert, addHabitSubmit, editHabitSubmit,
+} from './functions';
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Todos: line 14 - 190
@@ -15,22 +16,38 @@ function TodoForm({ formId }) {
   return (
     <form id={formId}>
       <div className='mb-5'>
-        <label className='w-full'>
+        <label className='w-full' htmlFor={`${formId}-title`}>
           Title
-          <input type='text' className='form-control' placeholder='Title' name='title' />
+          <input
+            id={`${formId}-title`}
+            type='text'
+            className='form-control'
+            placeholder='Title'
+            name='title'
+          />
         </label>
       </div>
       <div className='mb-5'>
-        <label className='w-full'>
+        <label className='w-full' htmlFor={`${formId}-desc`}>
           Description
-          <textarea className='form-control' placeholder='Description' name='description' />
+          <textarea
+            id={`${formId}-desc`}
+            className='form-control'
+            placeholder='Description'
+            name='description'
+          />
         </label>
       </div>
       <div className='mb-5'>
-        <label className='w-full'>
+        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+        <label className='w-full' htmlFor={`${formId}-deadline`}>
           Deadline
           <Datetime
-            inputProps={{ name: 'deadline', placeholder: 'Deadline' }}
+            inputProps={{
+              id: `${formId}-deadline`,
+              name: 'deadline',
+              placeholder: 'Deadline',
+            }}
           />
         </label>
       </div>
@@ -39,10 +56,7 @@ function TodoForm({ formId }) {
 }
 
 TodoForm.propTypes = {
-  formId: PropTypes.string,
-};
-TodoForm.defaultProps = {
-  formId: 'form-default',
+  formId: PropTypes.string.isRequired,
 };
 
 function AddTodoForm({ setTodoAll }) {
@@ -101,10 +115,7 @@ function AddTodoForm({ setTodoAll }) {
 }
 
 AddTodoForm.propTypes = {
-  setTodoAll: PropTypes.func,
-};
-AddTodoForm.defaultProps = {
-  setTodoAll: () => {},
+  setTodoAll: PropTypes.func.isRequired,
 };
 
 // Renders a Modal Form for editing a Todo item:
@@ -191,55 +202,199 @@ function editTodoSubmit(todo, setTodo, setTodoAll) {
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Habits: line 193 -
-function HabitForm({ formId }) {
+function HabitForm({
+  formId, formData, formSubmit, setHabits,
+}) {
+  const badHabitButton = React.useRef(null);
+  const goodHabitButton = React.useRef(null);
+  React.useEffect(() => {
+    badHabitButton.current.checked = formData.isBad;
+    goodHabitButton.current.checked = !formData.isBad;
+  });
   return (
-    <form id={formId}>
+    <form
+      id={formId}
+      onSubmit={(event) => formSubmit(event, setHabits, formData.id)}
+    >
       <div className='mb-5'>
-        <label className='w-full'>
+        <label className='w-full' htmlFor={`${formId}-title`}>
           Title
-          <input type='text' className='form-control' placeholder='Title' name='title' />
+          <input
+            type='text'
+            id={`${formId}-title`}
+            className='form-control'
+            placeholder='Title'
+            name='title'
+            defaultValue={formData.title}
+            required
+          />
         </label>
       </div>
       <div className='mb-5'>
-        <label className='w-full'>
+        <label className='w-full' htmlFor={`${formId}-desc`}>
           Description
-          <textarea className='form-control' placeholder='Description' name='description' />
+          <textarea
+            className='form-control'
+            id={`${formId}-desc`}
+            placeholder='Description'
+            defaultValue={formData.desc}
+            name='description'
+          />
         </label>
       </div>
       <div className='mb-5'>
-        <label className='w-full'>
-          Good Habit
-          <input type='radio' className='form-control' name='habit-type' />
+        <label className='w-full' htmlFor={`${formId}-streak`}>
+          <i className='fas fa-bolt pr-5' />
+          Streak /
+          <i className='fas fa-heart-broken px-5' />
+          Relapses
+          <input
+            type='number'
+            id={`${formId}-streak`}
+            className='form-control'
+            placeholder='0 by default'
+            name='streak'
+            defaultValue={formData.streak}
+          />
         </label>
-        <label className='w-full'>
-          Bad Habit
-          <input type='radio' className='form-control' name='habit-type' />
-        </label>
+      </div>
+      <div className='mb-5'>
+        <div className='mb-5'>
+          Select habit type:
+        </div>
+        <div className='custom-radio mb-5'>
+          <input
+            id={`${formId}-good`}
+            value='good'
+            type='radio'
+            name='habit-type'
+            ref={goodHabitButton}
+            required
+          />
+          <label htmlFor={`${formId}-good`}>Good Habit</label>
+        </div>
+        <div className='custom-radio'>
+          <input
+            id={`${formId}-bad`}
+            value='bad'
+            type='radio'
+            name='habit-type'
+            ref={badHabitButton}
+            required
+          />
+          <label htmlFor={`${formId}-bad`}>Bad Habit</label>
+        </div>
       </div>
     </form>
   );
 }
 
 HabitForm.propTypes = {
-  formId: PropTypes.string,
-};
-HabitForm.defaultProps = {
-  formId: 'default-form-id',
+  formId: PropTypes.string.isRequired,
+  formSubmit: PropTypes.func.isRequired,
+  setHabits: PropTypes.func.isRequired,
+  formData: PropTypes.shape({
+    id: PropTypes.number,
+    title: PropTypes.string,
+    desc: PropTypes.string,
+    isBad: PropTypes.bool,
+    streak: PropTypes.number,
+  }),
 };
 
-function AddHabitForm() {
+HabitForm.defaultProps = {
+  formData: {
+    title: '',
+    desc: '',
+    isBad: false,
+    streak: null,
+  },
+};
+
+function AddHabitForm({ setHabits }) {
+  const buttons = (
+    <div className='text-right'>
+      <button className='btn btn-dark mr-5' data-dismiss='modal' type='button'>
+        <i className='fas fa-times' />
+      </button>
+      <button
+        className='btn btn-secondary'
+        type='submit'
+        form='add-habit-form'
+      >
+        Save
+      </button>
+    </div>
+  );
+
   return (
     <Modal
       modalId='add-habit-modal'
       title='Add a Habit'
-      content={<HabitForm formId='add-habit-form' />}
+      content={(
+        <HabitForm
+          formId='add-habit-form'
+          formSubmit={addHabitSubmit}
+          setHabits={setHabits}
+        />
+      )}
+      buttons={buttons}
     />
   );
 }
+
+AddHabitForm.propTypes = {
+  setHabits: PropTypes.func.isRequired,
+};
+
+function EditHabitForm({ setHabits, formData }) {
+  const buttons = (
+    <div className='text-right'>
+      <button className='btn btn-dark mr-5' data-dismiss='modal' type='button'>
+        <i className='fas fa-times' />
+      </button>
+      <button
+        className='btn btn-secondary'
+        type='submit'
+        form='edit-habit-form'
+      >
+        Save
+      </button>
+    </div>
+  );
+
+  return (
+    <Modal
+      modalId='edit-habit-modal'
+      title='Edit a Habit'
+      content={(
+        <HabitForm
+          formId='edit-habit-form'
+          formData={formData}
+          formSubmit={editHabitSubmit}
+          setHabits={setHabits}
+        />
+      )}
+      buttons={buttons}
+    />
+  );
+}
+
+EditHabitForm.propTypes = {
+  formData: PropTypes.shape({
+    id: PropTypes.number,
+    title: PropTypes.string,
+    streak: PropTypes.number,
+    isBad: PropTypes.bool,
+    lastChecked: PropTypes.string,
+  }).isRequired,
+  setHabits: PropTypes.func.isRequired,
+};
 
 export {
   AddTodoForm,
   EditTodoForm,
   editTodoSubmit,
   AddHabitForm,
+  EditHabitForm,
 };

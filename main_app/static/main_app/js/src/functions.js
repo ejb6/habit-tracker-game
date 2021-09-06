@@ -122,6 +122,73 @@ function purchaseAvatar(id) {
     });
 }
 
+function markHabit(habitId, setHabits) {
+  fetch('/habits', {
+    method: 'PUT',
+    headers: { 'X-CSRFToken': csrftoken },
+    body: JSON.stringify({
+      id: habitId,
+      action: 'mark',
+    }),
+  }).then((response) => {
+    if (response.ok) {
+      setHabits((habits) => (habits.map((habit) => (
+        habit.id === habitId
+          ? { ...habit, streak: habit.streak + 1 }
+          : habit
+      ))));
+      rewardPopup();
+    }
+  });
+}
+
+function addHabitSubmit(event, setHabits) {
+  event.preventDefault();
+  window.halfmoon.toggleModal('add-habit-modal');
+  const form = event.target;
+  fetch('/habits', {
+    method: 'POST',
+    headers: { 'X-CSRFToken': csrftoken },
+    body: new FormData(form),
+  }).then((response) => {
+    if (response.ok) {
+      response.json().then((newHabit) => {
+        setHabits((habits) => ([
+          ...habits,
+          newHabit,
+        ]));
+      });
+    }
+  });
+  form.reset();
+}
+
+function editHabitSubmit(event, setHabits, habitId) {
+  event.preventDefault();
+  window.halfmoon.toggleModal('edit-habit-modal');
+  const form = event.target;
+  const formData = new FormData(form);
+  const formObject = { id: habitId, action: 'edit' };
+  formData.forEach((value, key) => {
+    formObject[key] = value;
+  });
+  fetch('/habits', {
+    method: 'PUT',
+    headers: { 'X-CSRFToken': csrftoken },
+    body: JSON.stringify(formObject),
+  }).then((response) => {
+    if (response.ok) {
+      response.json()
+        .then((json) => {
+          setHabits((habits) => (habits.map((habit) => (
+            habit.id === json.id ? json : habit
+          ))));
+        });
+    }
+  });
+  form.reset();
+}
+
 export {
   timeRemain,
   markTodo,
@@ -129,4 +196,7 @@ export {
   equipAvatar,
   purchaseAvatar,
   modalAlert,
+  markHabit,
+  addHabitSubmit,
+  editHabitSubmit,
 };
