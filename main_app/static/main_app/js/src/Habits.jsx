@@ -4,7 +4,9 @@ import PropTypes from 'prop-types';
 import { AddHabitForm, EditHabitForm } from './Forms';
 import { markHabit } from './functions';
 
-function HabitItem({ habit, setFormData, setHabits }) {
+function HabitItem({
+  habit, setFormData, setHabits, fetchStats,
+}) {
   // Classes of some element changes based on task completion
   // The div element for a single Todo item (buttons included):
 
@@ -13,7 +15,7 @@ function HabitItem({ habit, setFormData, setHabits }) {
     <button
       type='button'
       className='bg-secondary mr-10 mark'
-      onClick={() => markHabit(habit.id, setHabits)}
+      onClick={() => markHabit(habit.id, setHabits, fetchStats)}
     >
       <i className='fas fa-plus-circle' />
     </button>
@@ -24,7 +26,9 @@ function HabitItem({ habit, setFormData, setHabits }) {
       <button
         type='button'
         className='bg-warning mr-10 mark'
-        onClick={() => markHabit(habit.id, setHabits)}
+        onClick={() => {
+          markHabit(habit.id, setHabits, fetchStats);
+        }}
       >
         <i className='fas fa-minus-circle' />
       </button>
@@ -69,9 +73,10 @@ HabitItem.propTypes = {
   }).isRequired,
   setFormData: PropTypes.func.isRequired,
   setHabits: PropTypes.func.isRequired,
+  fetchStats: PropTypes.func.isRequired,
 };
 
-function HabitItems() {
+function HabitItems({ fetchStats }) {
   const [habits, setHabits] = React.useState([]);
   const [formData, setFormData] = React.useState({});
   React.useEffect(() => {
@@ -101,10 +106,15 @@ function HabitItems() {
           habit={habit}
           setFormData={setFormData}
           setHabits={setHabits}
+          fetchStats={fetchStats}
         />
       ))}
     </div>
   );
 }
+
+HabitItems.propTypes = {
+  fetchStats: PropTypes.func.isRequired,
+};
 
 export default HabitItems;

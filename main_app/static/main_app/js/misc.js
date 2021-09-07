@@ -1,5 +1,5 @@
 // Used to navigate each tab (Todos, Habits, Dailies)
-function openTab(tabName) {
+function openTab(event) {
   const tabContents = document.querySelectorAll('.tabcontent');
   tabContents.forEach((e) => {
     const tab = e;
@@ -10,11 +10,17 @@ function openTab(tabName) {
     const tabLink = e;
     tabLink.className = tabLink.className.replace(' active', '');
   });
-  document.getElementById(tabName).style.display = 'block';
-  document.getElementById(`${tabName}-tab`).className += ' active';
+  const tabTarget = event.target;
+  tabTarget.className += ' active';
+  const tabContentId = tabTarget.id.replace('-tab', '');
+  document.getElementById(tabContentId).style.display = 'block';
 }
+document.querySelectorAll('.tablinks').forEach((link) => {
+  const linkT = link;
+  linkT.onclick = openTab;
+});
 
 // For dismissing reward pop-ups
 document.querySelector('.dismiss-popup').onclick = () => {
-  document.querySelector('#rewards-popup').style.display = 'none';
+  document.querySelector('#alert-popup').style.display = 'none';
 };

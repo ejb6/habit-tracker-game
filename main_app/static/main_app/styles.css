@@ -108,7 +108,7 @@
 	}
 }
 
-#complete-popup {
+#alert-popup {
 	display: none;
 	z-index: 1;
 	position: fixed;
@@ -125,11 +125,11 @@
 	position: fixed;
 }
 
-#complete-popup .dismiss-popup {
+#alert-popup .dismiss-popup {
 	cursor: pointer;
 }
 
-#complete-popup .dismiss-popup:hover {
+#alert-popup .dismiss-popup:hover {
 	color: gray;
 }
 

@@ -103,7 +103,7 @@ def todos(request):
         if data['action'] == 'mark':
             todo.completed = timezone.now()
             todo.save()
-            request.user.task_complete()
+            request.user.task_complete(gold=20, exp=10)
 
             # Return the updated Todo object:
             return JsonResponse(todo.serialize(), status=200)
@@ -112,7 +112,7 @@ def todos(request):
         elif data['action'] == 'unmark':
             todo.completed = None
             todo.save()
-            request.user.task_incomplete()
+            request.user.task_incomplete(gold=20, exp=10)
 
             # Return the updated Todo object:
             return JsonResponse(todo.serialize(), status=200)
@@ -219,16 +219,23 @@ def habits(request):
             habit = request.user.habits.get(id=data['id'])
         except:
             return HttpResponse('Habit object not found', status=404)
+
         if data['action'] == 'mark':
             habit.streak += 1
             habit.last_checked = timezone.now()
             habit.save()
+            if habit.is_bad:
+                request.user.decrease_hp(6)
+            else:
+                request.user.task_complete(gold=10, exp=5)
             return HttpResponse('Marked', status=200)
+
         elif data['action'] == 'reset':
             habit.streak = 0
             habit.last_checked = timezone.now()
             habit.save()
             return HttpResponse('Reset', status=200)
+
         elif data['action'] == 'edit':
             try:
                 if data['habit-type'] == 'bad':
@@ -244,6 +251,10 @@ def habits(request):
                 return JsonResponse(habit.serialize(), status=200)
             except:
                 return HttpResponse('Failed', status=400)
+                
+        elif data['action'] == 'delete':
+            habit.delete()
+            return HttpResponse('Deleted', status=200)
 
     elif request.method == 'POST':
         data = request.POST

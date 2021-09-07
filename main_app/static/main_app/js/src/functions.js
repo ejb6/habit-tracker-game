@@ -6,11 +6,6 @@ import csrftoken from './csrf';
 // marking a todo as completed etc.
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-// Used to pop-up an alert:
-function modalAlert(text) {
-  alert(text);
-}
-
 // This is used to calculate the remaining time before a deadline:
 function timeRemain(deadlineStr) {
   const dateNow = new Date();
@@ -44,11 +39,12 @@ function timeRemain(deadlineStr) {
 }
 
 // Used for showing rewards received when completing a task:
-function rewardPopup() {
-  const popup = document.querySelector('#complete-popup');
+function alertNotif(text) {
+  const popup = document.querySelector('#alert-popup');
+  popup.children[0].innerHTML = text;
   popup.style.display = 'block';
   // Dismiss popup after 4 seconds:
-  setTimeout(() => { popup.style.display = 'none'; }, 4000);
+  setTimeout(() => { popup.style.display = 'none'; }, 5000);
 }
 
 // Used to mark/unmark a todo as completed:
@@ -65,15 +61,12 @@ function markTodo(action, todoId, setTodo, fetchStats) {
   }).then((response) => {
     if (!response.ok) {
       // If something is wrong
-      response.text().then((text) => modalAlert(text));
+      response.text().then((text) => alertNotif(text));
     } else {
       fetchStats();
       // Update the todo element:
       response.json().then((json) => {
         setTodo(json);
-        if (json.completed) {
-          rewardPopup();
-        }
       });
     }
   });
@@ -93,7 +86,7 @@ function deleteTodo(id, setTodoAll) {
       // delete from state
       setTodoAll((todoAll) => todoAll.filter((todo) => todo.id !== id));
     } else {
-      response.text().then((text) => modalAlert(text));
+      response.text().then((text) => alertNotif(text));
     }
   });
 }
@@ -105,7 +98,7 @@ function equipAvatar(id) {
       if (response.ok) {
         window.location.reload(true);
       } else {
-        response.text().then((text) => modalAlert(text));
+        response.text().then((text) => alertNotif(text));
       }
     });
 }
@@ -117,12 +110,12 @@ function purchaseAvatar(id) {
       if (response.ok) {
         window.location.reload(true);
       } else {
-        response.text().then((text) => modalAlert(text));
+        response.text().then((text) => alertNotif(text));
       }
     });
 }
 
-function markHabit(habitId, setHabits) {
+function markHabit(habitId, setHabits, fetchStats) {
   fetch('/habits', {
     method: 'PUT',
     headers: { 'X-CSRFToken': csrftoken },
@@ -137,7 +130,7 @@ function markHabit(habitId, setHabits) {
           ? { ...habit, streak: habit.streak + 1 }
           : habit
       ))));
-      rewardPopup();
+      fetchStats();
     }
   });
 }
@@ -189,14 +182,33 @@ function editHabitSubmit(event, setHabits, habitId) {
   form.reset();
 }
 
+function deleteHabit(habitId, setHabits) {
+  fetch('/habits', {
+    method: 'PUT',
+    headers: { 'X-CSRFToken': csrftoken },
+    body: JSON.stringify({
+      id: habitId,
+      action: 'delete',
+    }),
+  }).then((response) => {
+    if (response.ok) {
+      setHabits((habits) => habits.filter((habit) => (
+        habit.id !== habitId
+      )));
+      alertNotif('Deleted');
+    }
+  });
+}
+
 export {
   timeRemain,
   markTodo,
   deleteTodo,
   equipAvatar,
   purchaseAvatar,
-  modalAlert,
+  alertNotif,
   markHabit,
   addHabitSubmit,
   editHabitSubmit,
+  deleteHabit,
 };

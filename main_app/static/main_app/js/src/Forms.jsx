@@ -7,7 +7,11 @@ import 'react-datetime/css/react-datetime.css';
 // CSRF token for Django
 import csrftoken from './csrf';
 import {
-  deleteTodo, modalAlert, addHabitSubmit, editHabitSubmit,
+  deleteTodo,
+  alertNotif,
+  addHabitSubmit,
+  editHabitSubmit,
+  deleteHabit,
 } from './functions';
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -76,7 +80,7 @@ function AddTodoForm({ setTodoAll }) {
           setTodoAll((todoAllCurrent) => [...todoAllCurrent, newTodo]);
         });
       } else {
-        modalAlert('Something is wrong');
+        alertNotif('Something is wrong');
       }
     });
     formElement.reset();
@@ -192,7 +196,7 @@ function editTodoSubmit(todo, setTodo, setTodoAll) {
       body: JSON.stringify(dataObject),
     }).then((response) => {
       if (!response.ok) {
-        response.text().then((text) => modalAlert(text));
+        response.text().then((text) => alertNotif(text));
       } else {
         response.json().then((json) => setTodo(json));
       }
@@ -352,6 +356,14 @@ function EditHabitForm({ setHabits, formData }) {
     <div className='text-right'>
       <button className='btn btn-dark mr-5' data-dismiss='modal' type='button'>
         <i className='fas fa-times' />
+      </button>
+      <button
+        className='btn btn-danger mr-5'
+        data-dismiss='modal'
+        type='button'
+        onClick={() => deleteHabit(formData.id, setHabits)}
+      >
+        <i className='far fa-trash-alt' />
       </button>
       <button
         className='btn btn-secondary'

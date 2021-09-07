@@ -42,9 +42,9 @@ class User(AbstractUser):
     rewards_owned = models.ManyToManyField("Reward")
 
     # Called when a task is completed:
-    def task_complete(self):
-        self.gold += 30
-        self.exp_current += 10
+    def task_complete(self, gold, exp):
+        self.gold += gold
+        self.exp_current += exp
         # Level up the user (increase in exp)
         if self.exp_current >= self.exp_next:
             self.exp_current -= self.exp_next
@@ -55,9 +55,9 @@ class User(AbstractUser):
         self.save()
 
     # Called when a task is marked as incompleted:
-    def task_incomplete(self):
-        self.gold -= 30
-        self.exp_current -= 10
+    def task_incomplete(self, gold, exp):
+        self.gold -= gold
+        self.exp_current -= exp
         # Level down the user (revert back to original)
         if self.exp_current < 0:
             self.exp_next /= 2

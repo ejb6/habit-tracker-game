@@ -5,6 +5,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import Todos from './Todos';
+import HabitItems from './Habits';
+import { alertNotif } from './functions';
 
 // This is the component for a single status bar:
 function StatusBar({
@@ -55,18 +57,32 @@ function Gold({ gold }) {
 function StatusBars() {
   const [state, setState] = React.useState({});
   // For fetching player status:
-  function fetchStats() {
+  const fetchStats = () => {
     fetch('/stats').then((response) => response.json())
       .then((json) => {
-        setState(json);
+        setState((stateCurrent) => {
+          if (stateCurrent === {}) {
+            // pass
+          } else if (json.level > stateCurrent.level) {
+            alertNotif('Level Up!');
+          } else if (json.expCurrent > stateCurrent.expCurrent) {
+            alertNotif('Good Job!');
+          }
+          return json;
+        });
       });
-  }
+  };
   // Runs on mount only (does not run on state update)
   React.useEffect(() => {
     // Render the List of Todos:
     ReactDOM.render(
       <Todos fetchStats={fetchStats} />,
       document.querySelector('#todo-items'),
+    );
+    // Habit Items
+    ReactDOM.render(
+      <HabitItems fetchStats={fetchStats} />,
+      document.querySelector('#habit-items'),
     );
     fetchStats();
   }, []);

@@ -23,19 +23,13 @@
 		<h3>Tasks</h3>
 		<!-- Tab Links -->
 		<div id="tabs">
-			<button id="todos-tab" class="tablinks active" 
-				onclick="openTab('todos')"
-			>
+			<button id="todos-tab" class="tablinks active">
 				Todos
 			</button>
-			<button id="habits-tab" class="tablinks" 
-				onclick="openTab('habits')"
-			>
+			<button id="habits-tab" class="tablinks">
 				Habits
 			</button>
-			<button id="dailies-tab" class="tablinks" 
-				onclick="openTab('dailies')"
-			>
+			<button id="dailies-tab" class="tablinks">
 				Dailies
 			</button>
 		</div>
@@ -130,11 +124,9 @@
 </div>
 
 <!-- hide pop-ups from the bottom of the page -->
-<div id="complete-popup" class="bg-dark bg-white-lm shadow border">
-	+10 exp, +30
-	<i class="fas fa-coins"></i>
-	<i class="ml-10 fas fa-times-circle dismiss-popup">
-	</i>
+<div id="alert-popup" class="bg-dark bg-white-lm shadow border">
+	<span id="alert-popup-text"></span>
+	<i class="ml-10 fas fa-times-circle dismiss-popup"></i>
 </div>
 
 <!-- JS -->

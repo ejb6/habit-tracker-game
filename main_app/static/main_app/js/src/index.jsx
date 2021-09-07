@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import { EditTodoForm } from './Forms';
 import StatusBars from './StatusBars';
 import RewardPrompt from './Reward';
-import HabitItem from './Habits';
 
 // Render the form for editing a Todo:
 ReactDOM.render(
@@ -19,9 +18,4 @@ ReactDOM.render(
 ReactDOM.render(
   <RewardPrompt />,
   document.querySelector('#hidden-reward-prompt'),
-);
-// Habit Items
-ReactDOM.render(
-  <HabitItem />,
-  document.querySelector('#habit-items'),
 );
