@@ -6,11 +6,12 @@ import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 // CSRF token for Django:
 import { timeRemain, markTodo, deleteTodo } from './functions';
-import { AddTodoForm, editTodoSubmit } from './Forms';
+import { AddTodoForm, EditTodoForm } from './Forms';
 
 // A single todo item:
-function TodoItem({ todoInput, fetchStats, setTodoAll }) {
-  const [todo, setTodo] = React.useState(todoInput);
+function TodoItem({
+  todo, fetchStats, setTodoAll, setFormData,
+}) {
   // Classes of some element changes based on task completion
   // The div element for a single Todo item (buttons included):
   return (
@@ -26,7 +27,7 @@ function TodoItem({ todoInput, fetchStats, setTodoAll }) {
             type='button'
             className='bg-secondary mr-10 mark'
             onClick={() => {
-              markTodo('unmark', todo.id, setTodo, fetchStats);
+              markTodo('unmark', todo.id, setTodoAll, fetchStats);
             }}
           >
             <i className='fas fa-check-square' />
@@ -37,7 +38,7 @@ function TodoItem({ todoInput, fetchStats, setTodoAll }) {
             type='button'
             className='bg-warning mr-10 mark'
             onClick={() => {
-              markTodo('mark', todo.id, setTodo, fetchStats);
+              markTodo('mark', todo.id, setTodoAll, fetchStats);
             }}
           >
             <i className='far fa-check-square' />
@@ -72,9 +73,8 @@ function TodoItem({ todoInput, fetchStats, setTodoAll }) {
             className='delete-item-button bg-gray'
             data-dismiss='modal'
             onClick={() => {
-              editTodoSubmit(todo, setTodo, setTodoAll);
-              // eslint-disable-next-line no-undef
-              halfmoon.toggleModal('edit-todo-modal');
+              setFormData(todo);
+              window.halfmoon.toggleModal('edit-todo-modal');
             }}
           >
             <i className='fas fa-pencil-alt' />
@@ -85,19 +85,23 @@ function TodoItem({ todoInput, fetchStats, setTodoAll }) {
 }
 
 TodoItem.propTypes = {
-  todoInput: PropTypes.shape({
+  todo: PropTypes.shape({
     id: PropTypes.number,
     title: PropTypes.string,
+    description: PropTypes.string,
     deadline: PropTypes.string,
     completed: PropTypes.string,
   }).isRequired,
   fetchStats: PropTypes.func.isRequired,
   setTodoAll: PropTypes.func.isRequired,
+  setFormData: PropTypes.func.isRequired,
 };
 
 // Used to display all of the todo items together:
 function Todos({ fetchStats }) {
   const [todoAll, setTodoAll] = React.useState([]);
+  // Form data for editing todos:
+  const [formData, setFormData] = React.useState({});
 
   // This only runs on mount (does not run on state update);
   React.useEffect(() => {
@@ -117,13 +121,25 @@ function Todos({ fetchStats }) {
     };
   }, []);
 
+  React.useEffect(() => {
+    // Render the form for editing a Todo:
+    ReactDOM.render(
+      <EditTodoForm
+        formData={formData}
+        setTodoAll={setTodoAll}
+      />,
+      document.querySelector('#edit-todo'),
+    );
+  }, [formData]);
+
   return (
     <div>
       {todoAll.map((todo) => (
         <TodoItem
           key={todo.id}
-          todoInput={todo}
+          todo={todo}
           setTodoAll={setTodoAll}
+          setFormData={setFormData}
           fetchStats={fetchStats}
         />
       ))}

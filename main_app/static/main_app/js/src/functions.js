@@ -91,6 +91,60 @@ function deleteTodo(id, setTodoAll) {
   });
 }
 
+// Used for handling form submission for adding a Todo
+function addTodoSubmit(event, setTodoAll) {
+  event.preventDefault();
+  const formElement = event.target;
+  const formData = new FormData(formElement);
+  const deadline = new Date(formData.get('deadline'));
+  formData.set('deadline', deadline.toISOString());
+  fetch('/todos', {
+    method: 'POST',
+    headers: { 'X-CSRFToken': csrftoken },
+    body: formData,
+  }).then((response) => {
+    if (response.ok) {
+      response.json().then((newTodo) => {
+        setTodoAll((todoAll) => [...todoAll, newTodo]);
+      });
+      alertNotif('Todo added');
+    } else {
+      alertNotif('Something is wrong');
+    }
+  });
+  formElement.reset();
+}
+
+// This function handles submission for editing Todos
+function editTodoSubmit(event, todoId, setTodoAll) {
+  event.preventDefault();
+  // Handle edit form submission:
+  const form = event.target;
+  const formData = new FormData(form);
+  const deadlineDate = new Date(formData.get('deadline'));
+  formData.set('deadline', deadlineDate.toISOString());
+  // Used to tell Django that the 'action' is to edit a Todo:
+  const dataObject = { action: 'edit', id: todoId };
+  formData.forEach((value, key) => {
+    dataObject[key] = value;
+  });
+  fetch('/todos', {
+    method: 'PUT',
+    headers: { 'X-CSRFToken': csrftoken },
+    body: JSON.stringify(dataObject),
+  }).then((response) => {
+    if (!response.ok) {
+      response.text().then((text) => alertNotif(text));
+    } else {
+      response.json().then((json) => setTodoAll(
+        (todos) => todos.map(
+          (todo) => (todo.id === todoId ? json : todo),
+        ),
+      ));
+    }
+  });
+}
+
 // Used to equip an avatar
 function equipAvatar(id) {
   fetch(`/equip_avatar/${id}`)
@@ -204,6 +258,8 @@ export {
   timeRemain,
   markTodo,
   deleteTodo,
+  addTodoSubmit,
+  editTodoSubmit,
   equipAvatar,
   purchaseAvatar,
   alertNotif,

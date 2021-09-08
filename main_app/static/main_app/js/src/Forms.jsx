@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 // Datetime Picker for setting deadlines:
 import Datetime from 'react-datetime';
 import Modal from './components/Modal';
+import { IconButton, SubmitButton } from './components/ModalButtons';
+import FormInput from './components/FormInput';
 import 'react-datetime/css/react-datetime.css';
-// CSRF token for Django
-import csrftoken from './csrf';
 import {
   deleteTodo,
-  alertNotif,
+  addTodoSubmit,
+  editTodoSubmit,
   addHabitSubmit,
   editHabitSubmit,
   deleteHabit,
@@ -16,31 +17,31 @@ import {
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Todos: line 14 - 190
-function TodoForm({ formId }) {
+function TodoForm({ formId, formData, onSubmit }) {
+  const [deadline, setDeadline] = React.useState(null);
+  const isInitialMount = React.useRef(true);
+  React.useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+    } else {
+      setDeadline(new Date(formData.deadline));
+    }
+  }, [formData.deadline]);
   return (
-    <form id={formId}>
+    <form id={formId} onSubmit={onSubmit}>
       <div className='mb-5'>
-        <label className='w-full' htmlFor={`${formId}-title`}>
-          Title
-          <input
-            id={`${formId}-title`}
-            type='text'
-            className='form-control'
-            placeholder='Title'
-            name='title'
-          />
-        </label>
+        <FormInput
+          formId={formId}
+          name='title'
+          defaultValue={formData.title}
+        />
       </div>
       <div className='mb-5'>
-        <label className='w-full' htmlFor={`${formId}-desc`}>
-          Description
-          <textarea
-            id={`${formId}-desc`}
-            className='form-control'
-            placeholder='Description'
-            name='description'
-          />
-        </label>
+        <FormInput
+          formId={formId}
+          name='description'
+          defaultValue={formData.description}
+        />
       </div>
       <div className='mb-5'>
         {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
@@ -52,6 +53,8 @@ function TodoForm({ formId }) {
               name: 'deadline',
               placeholder: 'Deadline',
             }}
+            value={deadline}
+            onChange={(newDeadline) => setDeadline(newDeadline)}
           />
         </label>
       </div>
@@ -61,50 +64,40 @@ function TodoForm({ formId }) {
 
 TodoForm.propTypes = {
   formId: PropTypes.string.isRequired,
+  formData: PropTypes.shape({
+    id: PropTypes.number,
+    title: PropTypes.string,
+    description: PropTypes.string,
+    deadline: PropTypes.string,
+  }),
+  onSubmit: PropTypes.func.isRequired,
+};
+
+TodoForm.defaultProps = {
+  formData: {
+    id: 0,
+    title: '',
+    description: '',
+    deadline: (new Date()).toLocaleString(),
+  },
 };
 
 function AddTodoForm({ setTodoAll }) {
-  // Used for handling form submission for adding a Todo
-  function addTodoSubmit() {
-    const formElement = document.querySelector('#add-todo-form');
-    const formData = new FormData(formElement);
-    const deadline = new Date(formData.get('deadline'));
-    formData.set('deadline', deadline.toISOString());
-    fetch('/todos', {
-      method: 'POST',
-      headers: { 'X-CSRFToken': csrftoken },
-      body: formData,
-    }).then((response) => {
-      if (response.ok) {
-        response.json().then((newTodo) => {
-          setTodoAll((todoAllCurrent) => [...todoAllCurrent, newTodo]);
-        });
-      } else {
-        alertNotif('Something is wrong');
-      }
-    });
-    formElement.reset();
-  }
-
   const formApp = (
     <TodoForm
       formId='add-todo-form'
+      onSubmit={(event) => addTodoSubmit(event, setTodoAll)}
     />
   );
 
   const buttons = (
     <div className='text-right'>
-      <button className='btn btn-dark mr-5' data-dismiss='modal' type='button'>
-        <i className='fas fa-times' />
-      </button>
-      <button
-        onClick={addTodoSubmit}
-        data-dismiss='modal'
-        className='btn btn-secondary'
-        type='button'
-      >
-        Save
-      </button>
+      <IconButton
+        classAdd='btn-dark mr-5'
+        dismiss='modal'
+        faIcon='fas fa-times'
+      />
+      <SubmitButton formId='add-todo-form' />
     </div>
   );
 
@@ -123,34 +116,29 @@ AddTodoForm.propTypes = {
 };
 
 // Renders a Modal Form for editing a Todo item:
-function EditTodoForm() {
+function EditTodoForm({ formData, setTodoAll }) {
   const formApp = (
     <TodoForm
       formId='edit-todo-form'
+      formData={formData}
+      onSubmit={(event) => editTodoSubmit(event, formData.id, setTodoAll)}
     />
   );
 
   const buttons = (
     <div className='text-right'>
-      <button data-dismiss='modal' className='btn btn-dark mr-5' type='button'>
-        <i className='fas fa-times' />
-      </button>
-      <button
-        data-dismiss='modal'
-        className='btn btn-danger mr-5'
-        id='delete-edit-todo'
-        type='button'
-      >
-        <i className='far fa-trash-alt' />
-      </button>
-      <button
-        data-dismiss='modal'
-        id='submit-edit-todo'
-        className='btn btn-secondary'
-        type='button'
-      >
-        Save
-      </button>
+      <IconButton
+        classAdd='btn-dark mr-5'
+        faIcon='fas fa-times'
+      />
+      <IconButton
+        classAdd='btn-danger mr-5'
+        faIcon='far fa-trash-alt'
+        onClick={() => {
+          deleteTodo(formData.id, setTodoAll);
+        }}
+      />
+      <SubmitButton formId='edit-todo-form' />
     </div>
   );
 
@@ -164,45 +152,12 @@ function EditTodoForm() {
   );
 }
 
-// This function handles submission for editing Todos
-function editTodoSubmit(todo, setTodo, setTodoAll) {
-  // The following block is used to prefill the edit form
-  const form = document.querySelector('#edit-todo-form');
-  form.querySelector('input[name="title"]').value = todo.title;
-  const desc = form.querySelector('textarea[name="description"]');
-  desc.value = todo.description;
-  const deadline = form.querySelector('input[name="deadline"]');
-  let deadlineDate = new Date(todo.deadline);
-  deadline.value = deadlineDate.toLocaleString();
-
-  // The following is used to handle the delete button on the form:
-  document.querySelector('#delete-edit-todo').onclick = () => {
-    deleteTodo(todo.id, setTodoAll);
-  };
-
-  // Handle edit form submission:
-  document.querySelector('#submit-edit-todo').onclick = () => {
-    const formData = new FormData(form);
-    deadlineDate = new Date(formData.get('deadline'));
-    formData.set('deadline', deadlineDate.toISOString());
-    // Used to tell Django that the 'action' is to edit a Todo:
-    const dataObject = { action: 'edit', id: todo.id };
-    formData.forEach((value, key) => {
-      dataObject[key] = value;
-    });
-    fetch('/todos', {
-      method: 'PUT',
-      headers: { 'X-CSRFToken': csrftoken },
-      body: JSON.stringify(dataObject),
-    }).then((response) => {
-      if (!response.ok) {
-        response.text().then((text) => alertNotif(text));
-      } else {
-        response.json().then((json) => setTodo(json));
-      }
-    });
-  };
-}
+EditTodoForm.propTypes = {
+  formData: PropTypes.shape({
+    id: PropTypes.number,
+  }).isRequired,
+  setTodoAll: PropTypes.func.isRequired,
+};
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Habits: line 193 -
@@ -318,16 +273,14 @@ HabitForm.defaultProps = {
 function AddHabitForm({ setHabits }) {
   const buttons = (
     <div className='text-right'>
-      <button className='btn btn-dark mr-5' data-dismiss='modal' type='button'>
-        <i className='fas fa-times' />
-      </button>
-      <button
-        className='btn btn-secondary'
-        type='submit'
-        form='add-habit-form'
-      >
-        Save
-      </button>
+      <IconButton
+        classAdd='btn-dark mr-5'
+        dismiss='modal'
+        faIcon='fas fa-times'
+      />
+      <SubmitButton
+        formId='add-habit-form'
+      />
     </div>
   );
 
@@ -354,24 +307,20 @@ AddHabitForm.propTypes = {
 function EditHabitForm({ setHabits, formData }) {
   const buttons = (
     <div className='text-right'>
-      <button className='btn btn-dark mr-5' data-dismiss='modal' type='button'>
-        <i className='fas fa-times' />
-      </button>
-      <button
-        className='btn btn-danger mr-5'
-        data-dismiss='modal'
-        type='button'
+      <IconButton
+        classAdd='btn-dark mr-5'
+        faIcon='fas fa-times'
+        dismiss='modal'
+      />
+      <IconButton
+        classAdd='btn-danger mr-5'
+        faIcon='far fa-trash-alt'
+        dismiss='modal'
         onClick={() => deleteHabit(formData.id, setHabits)}
-      >
-        <i className='far fa-trash-alt' />
-      </button>
-      <button
-        className='btn btn-secondary'
-        type='submit'
-        form='edit-habit-form'
-      >
-        Save
-      </button>
+      />
+      <SubmitButton
+        formId='edit-habit-form'
+      />
     </div>
   );
 
