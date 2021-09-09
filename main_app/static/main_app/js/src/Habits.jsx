@@ -3,61 +3,54 @@ import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { AddHabitForm, EditHabitForm } from './Forms';
 import { markHabit } from './functions';
+import TaskButton from './components/TaskButtons';
+import TaskBody from './components/TaskBody';
 
 function HabitItem({
   habit, setFormData, setHabits, fetchStats,
 }) {
   // Classes of some element changes based on task completion
   // The div element for a single Todo item (buttons included):
-
   let streakIcon = <i className='fas fa-bolt pr-5' />;
   let markButton = (
-    <button
-      type='button'
-      className='bg-secondary mr-10 mark'
+    <TaskButton
+      className='bg-secondary mark mr-10'
       onClick={() => markHabit(habit.id, setHabits, fetchStats)}
-    >
-      <i className='fas fa-plus-circle' />
-    </button>
+      faIcon='fas fa-plus-circle'
+    />
   );
   if (habit.isBad) {
     streakIcon = <i className='fas fa-heart-broken pr-5' />;
     markButton = (
-      <button
-        type='button'
-        className='bg-warning mr-10 mark'
+      <TaskButton
+        className='bg-warning mark mr-10'
         onClick={() => {
           markHabit(habit.id, setHabits, fetchStats);
         }}
-      >
-        <i className='fas fa-minus-circle' />
-      </button>
+        faIcon='fas fa-minus-circle'
+      />
     );
   }
   return (
     <div className='task-item border-bottom mb-5'>
       {markButton}
-      <div className='py-5 overflow-hide task-title'>
-        <div>
-          {habit.title}
-        </div>
-        <small className='text-teal'>
+      <TaskBody
+        title={habit.title}
+        subtext={(
           <span>
             {streakIcon}
             {habit.streak}
           </span>
-        </small>
-      </div>
-      <button
-        type='button'
+        )}
+      />
+      <TaskButton
         className='delete-item-button bg-gray'
         onClick={() => {
           window.halfmoon.toggleModal('edit-habit-modal');
           setFormData(habit);
         }}
-      >
-        <i className='fas fa-pencil-alt' />
-      </button>
+        faIcon='fas fa-pencil-alt'
+      />
     </div>
   );
 }

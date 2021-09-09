@@ -282,3 +282,12 @@ def habits(request):
         [habit.serialize() for habit in habits],
         safe=False, status=200
     )
+
+
+@login_required
+def dailies(request):
+    dailies = request.user.dailies.all()
+    return JsonResponse(
+        [daily.serialize() for daily in dailies],
+        safe=False, status=200
+    )

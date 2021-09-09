@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import Todos from './Todos';
 import HabitItems from './Habits';
+import DailyItems from './Dailies';
 import { alertNotif } from './functions';
 
 // This is the component for a single status bar:
@@ -83,6 +84,11 @@ function StatusBars() {
     ReactDOM.render(
       <HabitItems fetchStats={fetchStats} />,
       document.querySelector('#habit-items'),
+    );
+    // Habit Items
+    ReactDOM.render(
+      <DailyItems fetchStats={fetchStats} />,
+      document.querySelector('#daily-items'),
     );
     fetchStats();
   }, []);

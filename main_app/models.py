@@ -3,18 +3,6 @@ from django.contrib.auth.models import AbstractUser
 from datetime import timedelta
 from django.utils import timezone
 
-# Todos
-# Create a dailies model
-# Handle the dailies using JS
-#   - JS should check wether a deadline is missed
-#   - Deadline should change when a task is complete
-# Calculate deduction on login using JS
-# for all tasks:
-#   if last checked was tody:
-#       skip
-#   if deadline < now:
-#       deduct (send to django)
-#       update last checked for this task
 
 # Reward for completing tasks:
 class Reward(models.Model):
@@ -26,8 +14,11 @@ class Reward(models.Model):
 # Create your models here.
 class User(AbstractUser):
     nickname = models.CharField(max_length=16)
+
     todo = models.ManyToManyField("Todo")
     habits = models.ManyToManyField("Habit")
+    dailies = models.ManyToManyField("Daily")
+
     # Player Stats:
     level = models.IntegerField(default=1)
     health_current = models.IntegerField(default=50)
@@ -108,12 +99,13 @@ class Todo(models.Model):
             "completed": self.completed
         }
 
+
 class Habit(models.Model):
     title = models.CharField(max_length=30)
     description = models.CharField(max_length=150, default='')
     # A habit can be either good or bad
     is_bad = models.BooleanField(default=False)
-    last_checked = models.DateTimeField(auto_now_add=True)
+    last_reset = models.DateTimeField(auto_now_add=True)
     streak = models.IntegerField(default=0)
 
     def serialize(self):
@@ -122,6 +114,19 @@ class Habit(models.Model):
             "title": self.title,
             "desc": self.description,
             "isBad": self.is_bad,
-            "lastChecked": self.last_checked,
+            "lastReset": self.last_reset,
             "streak": self.streak
+        }
+
+
+class Daily(models.Model):
+    title = models.CharField(max_length=30)
+    description = models.CharField(max_length=30)
+    last_completed = models.DateTimeField(null=True)
+
+    def serialize(self):
+        return {
+            'title': self.title,
+            'description': self.description,
+            'lastCompleted': self.last_completed,
         }

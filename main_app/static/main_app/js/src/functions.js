@@ -48,7 +48,7 @@ function alertNotif(text) {
 }
 
 // Used to mark/unmark a todo as completed:
-function markTodo(action, todoId, setTodo, fetchStats) {
+function markTodo(action, todoId, setTodos, fetchStats) {
   // 'action' parameter can be 'mark' or 'unmark'
   // Send a fetch request to mark the todo in Django:
   fetch('/todos', {
@@ -66,14 +66,16 @@ function markTodo(action, todoId, setTodo, fetchStats) {
       fetchStats();
       // Update the todo element:
       response.json().then((json) => {
-        setTodo(json);
+        setTodos((todos) => todos.map(
+          (todo) => (todo.id === todoId ? json : todo),
+        ));
       });
     }
   });
 }
 
 // Used to delete a Todo
-function deleteTodo(id, setTodoAll) {
+function deleteTodo(id, setTodos) {
   fetch('/todos', {
     method: 'PUT',
     headers: { 'X-CSRFToken': csrftoken },
@@ -84,7 +86,7 @@ function deleteTodo(id, setTodoAll) {
   }).then((response) => {
     if (response.ok) {
       // delete from state
-      setTodoAll((todoAll) => todoAll.filter((todo) => todo.id !== id));
+      setTodos((todoAll) => todoAll.filter((todo) => todo.id !== id));
     } else {
       response.text().then((text) => alertNotif(text));
     }
@@ -92,7 +94,7 @@ function deleteTodo(id, setTodoAll) {
 }
 
 // Used for handling form submission for adding a Todo
-function addTodoSubmit(event, setTodoAll) {
+function addTodoSubmit(event, setTodos) {
   event.preventDefault();
   const formElement = event.target;
   const formData = new FormData(formElement);
@@ -105,7 +107,7 @@ function addTodoSubmit(event, setTodoAll) {
   }).then((response) => {
     if (response.ok) {
       response.json().then((newTodo) => {
-        setTodoAll((todoAll) => [...todoAll, newTodo]);
+        setTodos((todoAll) => [...todoAll, newTodo]);
       });
       alertNotif('Todo added');
     } else {
@@ -116,7 +118,7 @@ function addTodoSubmit(event, setTodoAll) {
 }
 
 // This function handles submission for editing Todos
-function editTodoSubmit(event, todoId, setTodoAll) {
+function editTodoSubmit(event, todoId, setTodos) {
   event.preventDefault();
   // Handle edit form submission:
   const form = event.target;
@@ -136,7 +138,7 @@ function editTodoSubmit(event, todoId, setTodoAll) {
     if (!response.ok) {
       response.text().then((text) => alertNotif(text));
     } else {
-      response.json().then((json) => setTodoAll(
+      response.json().then((json) => setTodos(
         (todos) => todos.map(
           (todo) => (todo.id === todoId ? json : todo),
         ),

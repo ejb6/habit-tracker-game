@@ -20,7 +20,7 @@ document.querySelectorAll('.tablinks').forEach((link) => {
   linkT.onclick = openTab;
 });
 
-// For dismissing reward pop-ups
+// For dismissing pop-ups
 document.querySelector('.dismiss-popup').onclick = () => {
   document.querySelector('#alert-popup').style.display = 'none';
 };

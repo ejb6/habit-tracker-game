@@ -8,6 +8,7 @@ urlpatterns = [
     path('logout', views.logout_view, name='logout'),
     path('todos', views.todos, name='todos'),
     path('habits', views.habits, name='habits'),
+    path('dailies', views.dailies, name='dailies'),
     path('stats', views.user_stats, name='stats'),
     path(
         'equip_avatar/<str:avatar_name>',
