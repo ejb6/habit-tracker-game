@@ -18,15 +18,19 @@
 	{% endblock %}
 </head>
 <body data-set-preferred-mode-onload="true">
-	<!-- This area is for rendering modals -->
-	<div id="hidden">
-		<!-- Hidden by default -->
-		<div id="add-todo"></div>
-		<div id="edit-todo"></div>
-		<div id="add-habit"></div>
-		<div id="edit-habit"></div>
-		<div id="hidden-reward-prompt"></div>
-	</div>
+	{% if user.is_authenticated %}
+		<!-- This area is for rendering modals -->
+		<div id="hidden">
+			<!-- Hidden by default -->
+			<div id="add-todo"></div>
+			<div id="edit-todo"></div>
+			<div id="add-habit"></div>
+			<div id="edit-habit"></div>
+			<div id="add-daily"></div>
+			<div id="edit-daily"></div>
+			<div id="hidden-reward-prompt"></div>
+		</div>
+	{% endif %}
 
 	<div class="container">
 		<nav class="navbar pt-10">

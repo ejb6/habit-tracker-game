@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-from .models import User, Todo, Habit, Reward
+from .models import Daily, User, Todo, Habit, Reward
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
@@ -286,8 +286,43 @@ def habits(request):
 
 @login_required
 def dailies(request):
+    if request.method == 'POST':
+        try:
+            data = request.POST
+            daily = Daily.objects.create(
+                title = data['title'],
+                description = data['description']
+            )
+            request.user.dailies.add(daily)
+            return JsonResponse(daily.serialize(), status=200)
+        except:
+            return JsonResponse({'error': 'Failed to create task'}, status=400)
+    elif request.method == 'PUT':
+        try:
+            data = json.loads(request.body)
+            daily_item = request.user.dailies.get(id=data['id'])
+        except:
+            return JsonResponse({
+                'error': 'Cannot find task item on the server.'
+            }, status=404)
+
+        if data['action'] == 'delete':
+            daily_item.delete()
+            return JsonResponse({'message': 'Task deleted'}, status=200)
+        elif data['action'] == 'edit':
+            daily_item.update(data)
+            return JsonResponse(daily_item.serialize(), status=200)
+        elif data['action'] == 'mark':
+            daily_item.mark()
+            return JsonResponse(daily_item.serialize(), status=200)
+        elif data['action'] == 'unmark':
+            daily_item.unmark()
+            return JsonResponse(daily_item.serialize(), status=200)
     dailies = request.user.dailies.all()
     return JsonResponse(
         [daily.serialize() for daily in dailies],
         safe=False, status=200
     )
+
+
+

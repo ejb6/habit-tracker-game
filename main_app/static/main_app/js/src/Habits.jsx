@@ -86,7 +86,6 @@ function HabitItems({ fetchStats }) {
       <EditHabitForm
         setHabits={setHabits}
         formData={formData}
-        key={1}
       />,
       document.querySelector('#edit-habit'),
     );

@@ -13,6 +13,9 @@ import {
   addHabitSubmit,
   editHabitSubmit,
   deleteHabit,
+  addDailySubmit,
+  deleteDaily,
+  editDailySubmit,
 } from './functions';
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -82,16 +85,16 @@ TodoForm.defaultProps = {
   },
 };
 
-function AddTodoForm({ setTodoAll }) {
+function AddTodoForm({ setTodos }) {
   const formApp = (
     <TodoForm
       formId='add-todo-form'
-      onSubmit={(event) => addTodoSubmit(event, setTodoAll)}
+      onSubmit={(event) => addTodoSubmit(event, setTodos)}
     />
   );
 
   const buttons = (
-    <div className='text-right'>
+    <div className='text-right mt-15'>
       <IconButton
         classAdd='btn-dark mr-5'
         dismiss='modal'
@@ -112,21 +115,21 @@ function AddTodoForm({ setTodoAll }) {
 }
 
 AddTodoForm.propTypes = {
-  setTodoAll: PropTypes.func.isRequired,
+  setTodos: PropTypes.func.isRequired,
 };
 
 // Renders a Modal Form for editing a Todo item:
-function EditTodoForm({ formData, setTodoAll }) {
+function EditTodoForm({ formData, setTodos }) {
   const formApp = (
     <TodoForm
       formId='edit-todo-form'
       formData={formData}
-      onSubmit={(event) => editTodoSubmit(event, formData.id, setTodoAll)}
+      onSubmit={(event) => editTodoSubmit(event, formData.id, setTodos)}
     />
   );
 
   const buttons = (
-    <div className='text-right'>
+    <div className='text-right mt-15'>
       <IconButton
         classAdd='btn-dark mr-5'
         faIcon='fas fa-times'
@@ -135,7 +138,7 @@ function EditTodoForm({ formData, setTodoAll }) {
         classAdd='btn-danger mr-5'
         faIcon='far fa-trash-alt'
         onClick={() => {
-          deleteTodo(formData.id, setTodoAll);
+          deleteTodo(formData.id, setTodos);
         }}
       />
       <SubmitButton formId='edit-todo-form' />
@@ -156,7 +159,7 @@ EditTodoForm.propTypes = {
   formData: PropTypes.shape({
     id: PropTypes.number,
   }).isRequired,
-  setTodoAll: PropTypes.func.isRequired,
+  setTodos: PropTypes.func.isRequired,
 };
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -272,7 +275,7 @@ HabitForm.defaultProps = {
 
 function AddHabitForm({ setHabits }) {
   const buttons = (
-    <div className='text-right'>
+    <div className='text-right mt-15'>
       <IconButton
         classAdd='btn-dark mr-5'
         dismiss='modal'
@@ -306,7 +309,7 @@ AddHabitForm.propTypes = {
 
 function EditHabitForm({ setHabits, formData }) {
   const buttons = (
-    <div className='text-right'>
+    <div className='text-right mt-15'>
       <IconButton
         classAdd='btn-dark mr-5'
         faIcon='fas fa-times'
@@ -352,10 +355,128 @@ EditHabitForm.propTypes = {
   setHabits: PropTypes.func.isRequired,
 };
 
+function DailyForm({ formId, formSubmit, editData }) {
+  return (
+    <form id={formId} onSubmit={formSubmit}>
+      <div className='mb-5'>
+        <FormInput
+          formId={formId}
+          name='title'
+          defaultValue={editData.title}
+        />
+      </div>
+      <div className='mb-5'>
+        <FormInput
+          formId={formId}
+          name='description'
+          defaultValue={editData.description}
+        />
+      </div>
+    </form>
+  );
+}
+
+DailyForm.propTypes = {
+  formId: PropTypes.string.isRequired,
+  formSubmit: PropTypes.func.isRequired,
+  editData: PropTypes.shape({
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string,
+  }),
+};
+DailyForm.defaultProps = {
+  editData: {
+    title: '',
+    description: '',
+  },
+};
+
+function AddDailyForm({ setDailies }) {
+  const buttons = (
+    <div className='text-right mt-15'>
+      <IconButton
+        classAdd='btn-dark mr-5'
+        faIcon='fas fa-times'
+        dismiss='modal'
+      />
+      <SubmitButton
+        formId='add-daily-form'
+      />
+    </div>
+  );
+  return (
+    <Modal
+      modalId='add-daily-modal'
+      title='Add a Daily Task'
+      content={(
+        <DailyForm
+          formId='add-daily-form'
+          formSubmit={(event) => addDailySubmit(event, setDailies)}
+        />
+      )}
+      buttons={buttons}
+    />
+  );
+}
+AddDailyForm.propTypes = {
+  setDailies: PropTypes.func.isRequired,
+};
+
+function EditDailyForm({ editData, setDailies }) {
+  const buttons = (
+    <div className='text-right mt-15'>
+      <IconButton
+        classAdd='btn-dark mr-5'
+        faIcon='fas fa-times'
+        dismiss='modal'
+      />
+      <IconButton
+        classAdd='btn-danger mr-5'
+        faIcon='far fa-trash-alt'
+        onClick={() => {
+          deleteDaily(editData.id, setDailies);
+        }}
+        dismiss='modal'
+      />
+      <SubmitButton
+        formId='edit-daily-form'
+        formSubmit={() => {}}
+      />
+    </div>
+  );
+  return (
+    <Modal
+      modalId='edit-daily-modal'
+      title='Add a Daily Task'
+      content={(
+        <DailyForm
+          formId='edit-daily-form'
+          formSubmit={(event) => {
+            editDailySubmit(event, setDailies, editData.id);
+          }}
+          editData={editData}
+        />
+      )}
+      buttons={buttons}
+    />
+  );
+}
+
+EditDailyForm.propTypes = {
+  editData: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string,
+  }).isRequired,
+  setDailies: PropTypes.func.isRequired,
+};
+
 export {
   AddTodoForm,
   EditTodoForm,
   editTodoSubmit,
   AddHabitForm,
   EditHabitForm,
+  AddDailyForm,
+  EditDailyForm,
 };

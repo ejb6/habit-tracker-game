@@ -122,11 +122,29 @@ class Habit(models.Model):
 class Daily(models.Model):
     title = models.CharField(max_length=30)
     description = models.CharField(max_length=30)
+    # date and time when the user last completed a daily task:
     last_completed = models.DateTimeField(null=True)
+    # Temporarily stores the previous value for 'last_completed':
+    last_completed_prev = models.DateTimeField(null=True)
 
     def serialize(self):
         return {
+            'id': self.id,
             'title': self.title,
             'description': self.description,
             'lastCompleted': self.last_completed,
         }
+    def update(self, form_data):
+        self.title = form_data['title']
+        self.description = form_data['description']
+        self.save()
+    
+    def mark(self):
+        self.last_completed_prev = self.last_completed
+        self.last_completed = timezone.now()
+        self.save()
+        self.user_set.get().task_complete(gold=15, exp=15)
+    def unmark(self):
+        self.last_completed = self.last_completed_prev
+        self.save()
+        self.user_set.get().task_incomplete(gold=15, exp=15)

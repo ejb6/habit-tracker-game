@@ -3,7 +3,7 @@ import csrftoken from './csrf';
 // The contents of this file are functions that are not used
 // for rendering JSX components. Most of the functions are used
 // to communicate with the backend to perform actions like
-// marking a todo as completed etc.
+// marking a todo as completed etc. This is created for abstraction.
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 // This is used to calculate the remaining time before a deadline:
@@ -256,6 +256,110 @@ function deleteHabit(habitId, setHabits) {
   });
 }
 
+function addDailySubmit(event, setDailies) {
+  event.preventDefault();
+  const form = event.target;
+  fetch('/dailies', {
+    method: 'POST',
+    headers: { 'X-CSRFToken': csrftoken },
+    body: new FormData(form),
+  }).then((response) => response.json())
+    .then((json) => {
+      if (json.error) {
+        alertNotif(json.error);
+      } else {
+        setDailies((dailies) => [
+          ...dailies, json,
+        ]);
+      }
+    });
+}
+
+function editDailySubmit(event, setDailies, dailyId) {
+  event.preventDefault();
+  const form = event.target;
+  const formData = new FormData(form);
+  const formObject = {
+    action: 'edit',
+    id: dailyId,
+  };
+  formData.forEach((value, key) => {
+    formObject[key] = value;
+  });
+  fetch('/dailies', {
+    method: 'PUT',
+    headers: { 'X-CSRFToken': csrftoken },
+    body: JSON.stringify(formObject),
+  }).then((response) => response.json())
+    .then((json) => {
+      if (json.error) {
+        alertNotif(json.error);
+      } else {
+        setDailies((dailies) => (
+          dailies.map((daily) => (
+            daily.id === dailyId ? json : daily
+          ))
+        ));
+      }
+    });
+}
+
+function deleteDaily(dailyId, setDailies) {
+  fetch('/dailies', {
+    method: 'PUT',
+    headers: { 'X-CSRFToken': csrftoken },
+    body: JSON.stringify({
+      id: dailyId,
+      action: 'delete',
+    }),
+  }).then((response) => response.json())
+    .then((json) => {
+      if (json.error) {
+        alertNotif(json.error);
+      } else {
+        setDailies((dailies) => dailies.filter(
+          (daily) => daily.id !== dailyId,
+        ));
+        alertNotif(json.message);
+      }
+    });
+}
+
+function markDaily(dailyId, action, setDailies, fetchStats) {
+  fetch('/dailies', {
+    method: 'PUT',
+    headers: { 'X-CSRFToken': csrftoken },
+    body: JSON.stringify({
+      id: dailyId,
+      action,
+    }),
+  }).then((response) => response.json())
+    .then((json) => {
+      if (json.error) {
+        alertNotif(json.error);
+      } else {
+        setDailies((dailies) => (
+          dailies.map((daily) => (
+            daily.id === dailyId ? json : daily
+          ))
+        ));
+        fetchStats();
+      }
+    });
+}
+
+function dailyIsCompleted(dailyItem) {
+  if (dailyItem.lastCompleted == null) {
+    return false;
+  }
+  const lastCompleted = new Date(dailyItem.lastCompleted);
+  const today = (new Date()).toDateString();
+  if (today === lastCompleted.toDateString()) {
+    return true;
+  }
+  return false;
+}
+
 export {
   timeRemain,
   markTodo,
@@ -269,4 +373,9 @@ export {
   addHabitSubmit,
   editHabitSubmit,
   deleteHabit,
+  addDailySubmit,
+  editDailySubmit,
+  markDaily,
+  deleteDaily,
+  dailyIsCompleted,
 };
