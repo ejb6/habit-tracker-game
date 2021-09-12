@@ -10,6 +10,7 @@ urlpatterns = [
     path('habits', views.habits, name='habits'),
     path('dailies', views.dailies, name='dailies'),
     path('stats', views.user_stats, name='stats'),
+    path('check_missed/<str:query>', views.check_missed, name='check_missed'),
     path(
         'equip_avatar/<str:avatar_name>',
         views.equip_avatar,

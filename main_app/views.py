@@ -325,4 +325,44 @@ def dailies(request):
     )
 
 
+@login_required
+def check_missed(request, query):
+    if query == 'last_deduct':
+        return JsonResponse({
+            'lastDeductString': request.user.last_deduct
+        }, status=200)
+    elif query == 'todos':
+        todos = request.user.todo.filter(completed__isnull=True)
+        return JsonResponse(
+            [todo.deadline for todo in todos],
+            safe=False, status=200
+        )
+    elif query == 'good_habits':
+        habits = request.user.habits.filter(is_bad=False)
+        return JsonResponse(
+            [habit.last_marked for habit in habits],
+            safe=False, status=200
+        )
+    elif query == 'bad_habits':
+        habits = request.user.habits.filter(is_bad=True)
+        return JsonResponse(
+            [habit.last_marked for habit in habits],
+            safe=False, status=200
+        )
+    elif query == 'dailies':
+        dailies = request.user.dailies.all()
+        return JsonResponse(
+            [daily.last_completed for daily in dailies],
+            safe=False, status=200
+        )
+    
+    elif request.method == 'PUT':
+        data = json.loads(request.body)
+        request.user.decrease_hp(3 * data['hpDeductCount'])
+        exp_gain = 3 * data['expGainCount']
+        request.user.task_complete(gold=0, exp=exp_gain)
+        request.user.last_deduct = timezone.now()
 
+    return JsonResponse({
+        'error': 'Something is wrong with your request.'
+    }, status=400)

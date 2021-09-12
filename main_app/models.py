@@ -31,6 +31,8 @@ class User(AbstractUser):
     avatar = models.CharField(default="spider", max_length=16)
     # Rewards owned for completing tasks:
     rewards_owned = models.ManyToManyField("Reward")
+    # Last datetime where the missed deadlines were checked:
+    last_deduct = models.DateTimeField(auto_now_add=True)
 
     # Called when a task is completed:
     def task_complete(self, gold, exp):
@@ -105,7 +107,7 @@ class Habit(models.Model):
     description = models.CharField(max_length=150, default='')
     # A habit can be either good or bad
     is_bad = models.BooleanField(default=False)
-    last_reset = models.DateTimeField(auto_now_add=True)
+    last_marked = models.DateTimeField(auto_now_add=True)
     streak = models.IntegerField(default=0)
 
     def serialize(self):
@@ -114,9 +116,11 @@ class Habit(models.Model):
             "title": self.title,
             "desc": self.description,
             "isBad": self.is_bad,
-            "lastReset": self.last_reset,
+            "lastMarked": self.last_marked,
             "streak": self.streak
         }
+    def reset(self):
+        self.streak = 0
 
 
 class Daily(models.Model):

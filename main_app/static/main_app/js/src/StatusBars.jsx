@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import Todos from './Todos';
 import HabitItems from './Habits';
 import DailyItems from './Dailies';
-import { alertNotif } from './functions';
+import { alertNotif, calculateNewStats } from './functions';
 
 // This is the component for a single status bar:
 function StatusBar({
@@ -66,8 +66,6 @@ function StatusBars() {
             // pass
           } else if (json.level > stateCurrent.level) {
             alertNotif('Level Up!');
-          } else if (json.expCurrent > stateCurrent.expCurrent) {
-            alertNotif('Good Job!');
           }
           return json;
         });
@@ -90,6 +88,7 @@ function StatusBars() {
       <DailyItems fetchStats={fetchStats} />,
       document.querySelector('#daily-items'),
     );
+    calculateNewStats();
     fetchStats();
   }, []);
   return (

@@ -6,12 +6,16 @@ import csrftoken from './csrf';
 // marking a todo as completed etc. This is created for abstraction.
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+// The date now at 12 midnight
+const DATE_NOW = new Date();
+DATE_NOW.setHours(0, 0, 0, 0);
+
 // This is used to calculate the remaining time before a deadline:
 function timeRemain(deadlineStr) {
-  const dateNow = new Date();
+  const dateTimeNow = new Date();
   const dateDeadline = new Date(deadlineStr);
   // Time difference in days:
-  let diff = Math.round((dateDeadline - dateNow) / (1000 * 60 * 60 * 24));
+  let diff = Math.round((dateDeadline - dateTimeNow) / (1000 * 60 * 60 * 24));
   // Return value:
   let remain = '';
   // Way past deadline:
@@ -23,7 +27,7 @@ function timeRemain(deadlineStr) {
   } else {
     // Less than 24 hours left:
     // Time difference in hours:
-    diff = Math.round((dateDeadline - dateNow) / (1000 * 60 * 60));
+    diff = Math.round((dateDeadline - dateTimeNow) / (1000 * 60 * 60));
     if (diff === 0) {
       remain = 'Less than 30 mins left';
     } else if (diff === 1) {
@@ -36,6 +40,91 @@ function timeRemain(deadlineStr) {
     }
   }
   return remain;
+}
+
+// Used for calculating the health deductions for overdue todos
+function todoDeduct(deadlineString, lastDeduct) {
+  // 'todo' is an object fetched from django
+  // Health is only deducted once per day
+  // 'lastDeduct' is the date when the health was last deducted
+  const deadline = new Date(deadlineString);
+  deadline.setHours(0, 0, 0, 0);
+  if (deadline >= DATE_NOW || lastDeduct === DATE_NOW) {
+    return 0;
+  }
+  const refDate = deadline > lastDeduct ? deadline : lastDeduct;
+  const returnVal = (DATE_NOW - refDate) / (24 * 3600 * 1000);
+  return Math.round(returnVal);
+}
+
+// Similar to the previous function
+// Used for calculating the health deductions for missed habits/dailies
+function dailyDeduct(lastCompletedString, lastDeduct) {
+  // 'lastDeduct' is the date when the health was last deducted
+  const lastCompleted = new Date(lastCompletedString);
+  lastCompleted.setHours(0, 0, 0, 0);
+  const yesterday = new Date(DATE_NOW.getDate() - 1);
+  if (lastDeduct === DATE_NOW || lastCompleted >= yesterday) {
+    return 0;
+  }
+  const refDate = lastDeduct > lastCompleted ? lastDeduct : lastCompleted;
+  const returnVal = (DATE_NOW - refDate) / (24 * 3600 * 1000);
+  return Math.round(returnVal);
+}
+
+// Used for calculating EXP gain for not doing bad habits:
+function badHabitExp(lastMarkedString, lastDeduct) {
+  // 'lastDeduct' is used since this function is run when
+  // the deductions for missed tasks are also calculated
+  const lastRelapse = new Date(lastMarkedString);
+  lastRelapse.setHours(0, 0, 0, 0);
+  const yesterday = new Date(DATE_NOW.getDate() - 1);
+  if (lastDeduct === DATE_NOW || lastRelapse >= yesterday) {
+    return 0;
+  }
+  const refDate = lastDeduct > lastRelapse ? lastDeduct : lastRelapse;
+  const returnVal = (DATE_NOW - refDate) / (24 * 3600 * 1000);
+  return Math.round(returnVal);
+}
+
+async function calculateNewStats() {
+  const { lastDeductString } = await fetch('/check_missed/last_deduct')
+    .then((response) => response.json());
+  const lastDeduct = new Date(lastDeductString);
+  lastDeduct.setHours(0, 0, 0, 0);
+  let hpDeductCount = 0;
+  let expGainCount = 0;
+
+  const todos = await fetch('check_missed/todos')
+    .then((response) => response.json());
+  todos.forEach((deadlineString) => {
+    hpDeductCount += todoDeduct(deadlineString, lastDeduct);
+  });
+
+  const goodHabits = await fetch('check_missed/good_habits')
+    .then((response) => response.json());
+  goodHabits.forEach((lastMarked) => {
+    hpDeductCount += dailyDeduct(lastMarked, lastDeduct);
+  });
+
+  const badHabits = await fetch('check_missed/bad_habits')
+    .then((response) => response.json());
+  badHabits.forEach((lastMarked) => {
+    expGainCount += badHabitExp(lastMarked, lastDeduct);
+  });
+
+  const dailies = await fetch('check_missed/dailies')
+    .then((response) => response.json());
+  dailies.forEach((lastCompleted) => {
+    hpDeductCount += dailyDeduct(lastCompleted, lastDeduct);
+  });
+  console.log(hpDeductCount);
+  console.log(expGainCount);
+  // await fetch('check_missed', {
+  //  method: 'PUT',
+  //  headers: { 'X-CSRFToken': csrftoken },
+  //  body: JSON.stringify({ hpDeductCount, expGainCount }),
+  // });
 }
 
 // Used for showing rewards received when completing a task:
@@ -362,6 +451,10 @@ function dailyIsCompleted(dailyItem) {
 
 export {
   timeRemain,
+  todoDeduct,
+  dailyDeduct,
+  badHabitExp,
+  calculateNewStats,
   markTodo,
   deleteTodo,
   addTodoSubmit,
