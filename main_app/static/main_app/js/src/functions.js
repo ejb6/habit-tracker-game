@@ -4,6 +4,9 @@ import csrftoken from './csrf';
 // for rendering JSX components. Most of the functions are used
 // to communicate with the backend to perform actions like
 // marking a todo as completed etc. This is created for abstraction.
+// Other functions like showing alerts are also included.
+// To navigate this file easily, go to the end of this file and search
+// for the functions that are on the export list using your editor/IDE.
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 // The date now at 12 midnight
@@ -42,6 +45,43 @@ function timeRemain(deadlineStr) {
   return remain;
 }
 
+// Used for showing rewards received when completing a task:
+// Shows a small popup from the bottom:
+function alertPopups(text) {
+  const popup = document.querySelector('#alert-popup');
+  popup.children[0].innerHTML = text;
+  popup.style.display = 'block';
+  // Dismiss popup after 4 seconds:
+  setTimeout(() => { popup.style.display = 'none'; }, 5000);
+}
+
+// Shows a modal for alerts:
+function alertModal(textList) {
+  window.halfmoon.toggleModal('alert-modal');
+  const alertList = document.querySelector('#alert-list');
+  alertList.innerHTML = '';
+  textList.forEach((text) => {
+    const listItem = document.createElement('li');
+    listItem.innerHTML = text;
+    alertList.appendChild(listItem);
+  });
+}
+
+function resetHabitStreak(habitId) {
+  fetch('/habits', {
+    method: 'PUT',
+    headers: { 'X-CSRFToken': csrftoken },
+    body: JSON.stringify({
+      id: habitId,
+      action: 'reset',
+    }),
+  }).then((response) => {
+    if (!response.ok) {
+      alertPopups('Something is wrong');
+    }
+  });
+}
+
 // Used for calculating the health deductions for overdue todos
 function todoDeduct(deadlineString, lastDeduct) {
   // 'todo' is an object fetched from django
@@ -49,7 +89,7 @@ function todoDeduct(deadlineString, lastDeduct) {
   // 'lastDeduct' is the date when the health was last deducted
   const deadline = new Date(deadlineString);
   deadline.setHours(0, 0, 0, 0);
-  if (deadline >= DATE_NOW || lastDeduct === DATE_NOW) {
+  if (deadline >= DATE_NOW || lastDeduct.getTime() === DATE_NOW.getTime()) {
     return 0;
   }
   const refDate = deadline > lastDeduct ? deadline : lastDeduct;
@@ -58,42 +98,42 @@ function todoDeduct(deadlineString, lastDeduct) {
 }
 
 // Similar to the previous function
-// Used for calculating the health deductions for missed habits/dailies
-function dailyDeduct(lastCompletedString, lastDeduct) {
+// Used for calculating the health deductions for missed habits/dailies:
+// Also used for calculating the exp gain for bad habits by avoiding them:
+function dailyHabitPoints(lastCompletedString, dateCreated, lastDeduct) {
   // 'lastDeduct' is the date when the health was last deducted
   const lastCompleted = new Date(lastCompletedString);
   lastCompleted.setHours(0, 0, 0, 0);
   const yesterday = new Date(DATE_NOW.getDate() - 1);
-  if (lastDeduct === DATE_NOW || lastCompleted >= yesterday) {
+  if (
+    dateCreated.getTime() === DATE_NOW.getTime()
+    || lastDeduct.getTime() === DATE_NOW.getTime()
+    || lastCompleted >= yesterday
+  ) {
     return 0;
   }
-  const refDate = lastDeduct > lastCompleted ? lastDeduct : lastCompleted;
+  // Reference Date:
+  // Choose the most recent date among the three:
+  const refDate = new Date(Math.max(lastCompleted, dateCreated, lastDeduct));
+  // Calculate the number of days between today and the reference date:
   const returnVal = (DATE_NOW - refDate) / (24 * 3600 * 1000);
   return Math.round(returnVal);
 }
 
-// Used for calculating EXP gain for not doing bad habits:
-function badHabitExp(lastMarkedString, lastDeduct) {
-  // 'lastDeduct' is used since this function is run when
-  // the deductions for missed tasks are also calculated
-  const lastRelapse = new Date(lastMarkedString);
-  lastRelapse.setHours(0, 0, 0, 0);
-  const yesterday = new Date(DATE_NOW.getDate() - 1);
-  if (lastDeduct === DATE_NOW || lastRelapse >= yesterday) {
-    return 0;
-  }
-  const refDate = lastDeduct > lastRelapse ? lastDeduct : lastRelapse;
-  const returnVal = (DATE_NOW - refDate) / (24 * 3600 * 1000);
-  return Math.round(returnVal);
-}
-
-async function calculateNewStats() {
+// The following funciton is run once per day once the user logs in.
+// This is used to calculate HP after deduction for missed tasks
+async function calculateNewStats(fetchStats) {
   const { lastDeductString } = await fetch('/check_missed/last_deduct')
     .then((response) => response.json());
   const lastDeduct = new Date(lastDeductString);
   lastDeduct.setHours(0, 0, 0, 0);
   let hpDeductCount = 0;
   let expGainCount = 0;
+
+  if (lastDeduct.getTime() === DATE_NOW.getTime()) {
+    fetchStats();
+    return;
+  }
 
   const todos = await fetch('check_missed/todos')
     .then((response) => response.json());
@@ -103,37 +143,52 @@ async function calculateNewStats() {
 
   const goodHabits = await fetch('check_missed/good_habits')
     .then((response) => response.json());
-  goodHabits.forEach((lastMarked) => {
-    hpDeductCount += dailyDeduct(lastMarked, lastDeduct);
+  goodHabits.forEach((habit) => {
+    const dateCreated = new Date(habit.created);
+    dateCreated.setHours(0, 0, 0, 0);
+    const deduct = dailyHabitPoints(habit.lastMarked, dateCreated, lastDeduct);
+    if (deduct > 0) {
+      resetHabitStreak(habit.id);
+    }
+    hpDeductCount += deduct;
   });
 
   const badHabits = await fetch('check_missed/bad_habits')
     .then((response) => response.json());
-  badHabits.forEach((lastMarked) => {
-    expGainCount += badHabitExp(lastMarked, lastDeduct);
+  badHabits.forEach((habit) => {
+    const dateCreated = new Date(habit.created);
+    dateCreated.setHours(0, 0, 0, 0);
+    const gain = dailyHabitPoints(habit.lastMarked, dateCreated, lastDeduct);
+    if (gain > 0) {
+      resetHabitStreak(habit.id);
+    }
+    expGainCount += gain;
   });
 
   const dailies = await fetch('check_missed/dailies')
     .then((response) => response.json());
-  dailies.forEach((lastCompleted) => {
-    hpDeductCount += dailyDeduct(lastCompleted, lastDeduct);
+  dailies.forEach((daily) => {
+    const dateCreated = new Date(daily.created);
+    dateCreated.setHours(0, 0, 0, 0);
+    hpDeductCount += dailyHabitPoints(daily.lastCompleted, dateCreated, lastDeduct);
   });
-  console.log(hpDeductCount);
-  console.log(expGainCount);
-  // await fetch('check_missed', {
-  //  method: 'PUT',
-  //  headers: { 'X-CSRFToken': csrftoken },
-  //  body: JSON.stringify({ hpDeductCount, expGainCount }),
-  // });
-}
-
-// Used for showing rewards received when completing a task:
-function alertNotif(text) {
-  const popup = document.querySelector('#alert-popup');
-  popup.children[0].innerHTML = text;
-  popup.style.display = 'block';
-  // Dismiss popup after 4 seconds:
-  setTimeout(() => { popup.style.display = 'none'; }, 5000);
+  const alertTexts = [];
+  if (hpDeductCount) {
+    alertTexts.push(`You lost ${hpDeductCount * 3} HP. Make sure
+      to complete your good habits and daily tasks everyday.`);
+  }
+  if (expGainCount) {
+    alertTexts.push(`You gained ${expGainCount * 3} EXP.
+      Avoid relapsing to your bad habits to keep gaining.`);
+  }
+  if (alertTexts) {
+    alertModal(alertTexts);
+  }
+  fetch('/check_missed/deduct', {
+    method: 'PUT',
+    headers: { 'X-CSRFToken': csrftoken },
+    body: JSON.stringify({ hpDeductCount, expGainCount }),
+  }).then(fetchStats());
 }
 
 // Used to mark/unmark a todo as completed:
@@ -150,7 +205,7 @@ function markTodo(action, todoId, setTodos, fetchStats) {
   }).then((response) => {
     if (!response.ok) {
       // If something is wrong
-      response.text().then((text) => alertNotif(text));
+      response.text().then((text) => alertPopups(text));
     } else {
       fetchStats();
       // Update the todo element:
@@ -177,7 +232,7 @@ function deleteTodo(id, setTodos) {
       // delete from state
       setTodos((todoAll) => todoAll.filter((todo) => todo.id !== id));
     } else {
-      response.text().then((text) => alertNotif(text));
+      response.text().then((text) => alertPopups(text));
     }
   });
 }
@@ -198,9 +253,9 @@ function addTodoSubmit(event, setTodos) {
       response.json().then((newTodo) => {
         setTodos((todoAll) => [...todoAll, newTodo]);
       });
-      alertNotif('Todo added');
+      alertPopups('Todo added');
     } else {
-      alertNotif('Something is wrong');
+      alertPopups('Something is wrong');
     }
   });
   formElement.reset();
@@ -225,7 +280,7 @@ function editTodoSubmit(event, todoId, setTodos) {
     body: JSON.stringify(dataObject),
   }).then((response) => {
     if (!response.ok) {
-      response.text().then((text) => alertNotif(text));
+      response.text().then((text) => alertPopups(text));
     } else {
       response.json().then((json) => setTodos(
         (todos) => todos.map(
@@ -243,7 +298,7 @@ function equipAvatar(id) {
       if (response.ok) {
         window.location.reload(true);
       } else {
-        response.text().then((text) => alertNotif(text));
+        response.text().then((text) => alertPopups(text));
       }
     });
 }
@@ -255,7 +310,7 @@ function purchaseAvatar(id) {
       if (response.ok) {
         window.location.reload(true);
       } else {
-        response.text().then((text) => alertNotif(text));
+        response.text().then((text) => alertPopups(text));
       }
     });
 }
@@ -282,7 +337,6 @@ function markHabit(habitId, setHabits, fetchStats) {
 
 function addHabitSubmit(event, setHabits) {
   event.preventDefault();
-  window.halfmoon.toggleModal('add-habit-modal');
   const form = event.target;
   fetch('/habits', {
     method: 'POST',
@@ -296,6 +350,9 @@ function addHabitSubmit(event, setHabits) {
           newHabit,
         ]));
       });
+      alertPopups('Habit added');
+    } else {
+      alertPopups('Failed to create a task.');
     }
   });
   form.reset();
@@ -303,7 +360,6 @@ function addHabitSubmit(event, setHabits) {
 
 function editHabitSubmit(event, setHabits, habitId) {
   event.preventDefault();
-  window.halfmoon.toggleModal('edit-habit-modal');
   const form = event.target;
   const formData = new FormData(form);
   const formObject = { id: habitId, action: 'edit' };
@@ -340,7 +396,7 @@ function deleteHabit(habitId, setHabits) {
       setHabits((habits) => habits.filter((habit) => (
         habit.id !== habitId
       )));
-      alertNotif('Deleted');
+      alertPopups('Deleted');
     }
   });
 }
@@ -355,13 +411,14 @@ function addDailySubmit(event, setDailies) {
   }).then((response) => response.json())
     .then((json) => {
       if (json.error) {
-        alertNotif(json.error);
+        alertPopups(json.error);
       } else {
         setDailies((dailies) => [
           ...dailies, json,
         ]);
       }
     });
+  form.reset();
 }
 
 function editDailySubmit(event, setDailies, dailyId) {
@@ -382,7 +439,7 @@ function editDailySubmit(event, setDailies, dailyId) {
   }).then((response) => response.json())
     .then((json) => {
       if (json.error) {
-        alertNotif(json.error);
+        alertPopups(json.error);
       } else {
         setDailies((dailies) => (
           dailies.map((daily) => (
@@ -391,6 +448,7 @@ function editDailySubmit(event, setDailies, dailyId) {
         ));
       }
     });
+  form.reset();
 }
 
 function deleteDaily(dailyId, setDailies) {
@@ -404,12 +462,12 @@ function deleteDaily(dailyId, setDailies) {
   }).then((response) => response.json())
     .then((json) => {
       if (json.error) {
-        alertNotif(json.error);
+        alertPopups(json.error);
       } else {
         setDailies((dailies) => dailies.filter(
           (daily) => daily.id !== dailyId,
         ));
-        alertNotif(json.message);
+        alertPopups(json.message);
       }
     });
 }
@@ -425,7 +483,7 @@ function markDaily(dailyId, action, setDailies, fetchStats) {
   }).then((response) => response.json())
     .then((json) => {
       if (json.error) {
-        alertNotif(json.error);
+        alertPopups(json.error);
       } else {
         setDailies((dailies) => (
           dailies.map((daily) => (
@@ -451,9 +509,6 @@ function dailyIsCompleted(dailyItem) {
 
 export {
   timeRemain,
-  todoDeduct,
-  dailyDeduct,
-  badHabitExp,
   calculateNewStats,
   markTodo,
   deleteTodo,
@@ -461,7 +516,7 @@ export {
   editTodoSubmit,
   equipAvatar,
   purchaseAvatar,
-  alertNotif,
+  alertPopups,
   markHabit,
   addHabitSubmit,
   editHabitSubmit,

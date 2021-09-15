@@ -221,21 +221,11 @@ def habits(request):
             return HttpResponse('Habit object not found', status=404)
 
         if data['action'] == 'mark':
-            habit.streak += 1
-            habit.last_checked = timezone.now()
-            habit.save()
-            if habit.is_bad:
-                request.user.decrease_hp(6)
-            else:
-                request.user.task_complete(gold=10, exp=5)
+            habit.mark()
             return HttpResponse('Marked', status=200)
-
         elif data['action'] == 'reset':
-            habit.streak = 0
-            habit.last_checked = timezone.now()
-            habit.save()
+            habit.reset()
             return HttpResponse('Reset', status=200)
-
         elif data['action'] == 'edit':
             try:
                 if data['habit-type'] == 'bad':
@@ -340,19 +330,19 @@ def check_missed(request, query):
     elif query == 'good_habits':
         habits = request.user.habits.filter(is_bad=False)
         return JsonResponse(
-            [habit.last_marked for habit in habits],
+            [habit.check_missed() for habit in habits],
             safe=False, status=200
         )
     elif query == 'bad_habits':
         habits = request.user.habits.filter(is_bad=True)
         return JsonResponse(
-            [habit.last_marked for habit in habits],
+            [habit.check_missed() for habit in habits],
             safe=False, status=200
         )
     elif query == 'dailies':
         dailies = request.user.dailies.all()
         return JsonResponse(
-            [daily.last_completed for daily in dailies],
+            [daily.check_missed() for daily in dailies],
             safe=False, status=200
         )
     
@@ -360,8 +350,10 @@ def check_missed(request, query):
         data = json.loads(request.body)
         request.user.decrease_hp(3 * data['hpDeductCount'])
         exp_gain = 3 * data['expGainCount']
-        request.user.task_complete(gold=0, exp=exp_gain)
+        request.user.task_complete(exp=exp_gain)
         request.user.last_deduct = timezone.now()
+        request.user.save()
+        return JsonResponse({'message': 'Deducted'}, status=200)
 
     return JsonResponse({
         'error': 'Something is wrong with your request.'

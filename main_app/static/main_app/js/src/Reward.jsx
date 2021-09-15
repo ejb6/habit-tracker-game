@@ -13,7 +13,8 @@ function RewardPrompt() {
     // Adds an event listener for all reward items:
     const rewardItems = document.querySelectorAll('.reward-item');
     rewardItems.forEach((item) => {
-      item.onclick = () => {
+      const itemElement = item;
+      itemElement.onclick = () => {
         const price = item.children[1].children[1].innerHTML;
         setPromptItem({
           name: item.children[1].children[0].innerHTML,
@@ -21,7 +22,7 @@ function RewardPrompt() {
           price,
           id: item.id,
         });
-        halfmoon.toggleModal('reward-prompt');
+        window.halfmoon.toggleModal('reward-prompt');
       };
     });
   }, []);

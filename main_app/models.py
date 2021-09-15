@@ -35,7 +35,7 @@ class User(AbstractUser):
     last_deduct = models.DateTimeField(auto_now_add=True)
 
     # Called when a task is completed:
-    def task_complete(self, gold, exp):
+    def task_complete(self, gold=0, exp=0):
         self.gold += gold
         self.exp_current += exp
         # Level up the user (increase in exp)
@@ -48,7 +48,7 @@ class User(AbstractUser):
         self.save()
 
     # Called when a task is marked as incompleted:
-    def task_incomplete(self, gold, exp):
+    def task_incomplete(self, gold=0, exp=0):
         self.gold -= gold
         self.exp_current -= exp
         # Level down the user (revert back to original)
@@ -107,8 +107,9 @@ class Habit(models.Model):
     description = models.CharField(max_length=150, default='')
     # A habit can be either good or bad
     is_bad = models.BooleanField(default=False)
-    last_marked = models.DateTimeField(auto_now_add=True)
+    last_marked = models.DateTimeField(null=True)
     streak = models.IntegerField(default=0)
+    date_created = models.DateTimeField(auto_now_add=True)
 
     def serialize(self):
         return {
@@ -119,8 +120,27 @@ class Habit(models.Model):
             "lastMarked": self.last_marked,
             "streak": self.streak
         }
+
+    def mark(self):
+        self.streak += 1
+        self.last_marked = timezone.now()
+        self.save()
+        if self.is_bad:
+            self.user_set.get().decrease_hp(6)
+        else:
+            self.user_set.get().task_complete(gold=10, exp=5)
+
     def reset(self):
         self.streak = 0
+        self.save()
+
+    # Used for checking if the daily task is missed:
+    def check_missed(self):
+        return {
+            'id': self.id,
+            'lastMarked': self.last_marked,
+            'created': self.date_created
+        }
 
 
 class Daily(models.Model):
@@ -128,6 +148,7 @@ class Daily(models.Model):
     description = models.CharField(max_length=30)
     # date and time when the user last completed a daily task:
     last_completed = models.DateTimeField(null=True)
+    date_created = models.DateTimeField(auto_now_add=True)
     # Temporarily stores the previous value for 'last_completed':
     last_completed_prev = models.DateTimeField(null=True)
 
@@ -137,6 +158,12 @@ class Daily(models.Model):
             'title': self.title,
             'description': self.description,
             'lastCompleted': self.last_completed,
+        }
+    # Used for checking if the daily task is missed:
+    def check_missed(self):
+        return {
+            'lastCompleted': self.last_completed,
+            'created': self.date_created
         }
     def update(self, form_data):
         self.title = form_data['title']

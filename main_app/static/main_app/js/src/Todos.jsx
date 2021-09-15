@@ -14,6 +14,8 @@ import TaskBody from './components/TaskBody';
 function TodoItem({
   todo, fetchStats, setTodos, setFormData,
 }) {
+  // If there is a description, a semicolon will be added
+  const description = todo.description ? `: ${todo.description}` : '';
   // Some elements change based on task completion
   let todoClass;
   let markFunction; // for marking todos as completed
@@ -21,6 +23,7 @@ function TodoItem({
   let markIcon;
   let editFunction; // for deleting or editing
   let editIcon;
+  let subtext;
   if (todo.completed) {
     todoClass = 'task-item border-bottom mb-5 completed';
     markFunction = () => {
@@ -30,6 +33,7 @@ function TodoItem({
     markIcon = 'fas fa-check-square';
     editFunction = () => deleteTodo(todo.id, setTodos);
     editIcon = 'far fa-trash-alt';
+    subtext = `Completed${description}`;
   } else {
     todoClass = 'task-item border-bottom mb-5';
     markFunction = () => {
@@ -42,9 +46,9 @@ function TodoItem({
       window.halfmoon.toggleModal('edit-todo-modal');
     };
     editIcon = 'fas fa-pencil-alt';
+    subtext = timeRemain(todo.deadline) + description;
   }
 
-  const description = todo.description ? `: ${todo.description}` : '';
   return (
     <div id={`todo${todo.id}`} className={todoClass}>
       <TaskButton
@@ -54,7 +58,7 @@ function TodoItem({
       />
       <TaskBody
         title={todo.title}
-        subtext={timeRemain(todo.deadline) + description}
+        subtext={subtext}
       />
       <TaskButton
         className='bg-gray'
