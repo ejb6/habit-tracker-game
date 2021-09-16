@@ -6,8 +6,8 @@
 This is an RPG habit tracker/task manager similar to Habitica (in progress).
 
 
-## Screenshot
-![image](https://user-images.githubusercontent.com/76241888/131854859-1493f046-279a-44f9-afd3-e8e0c1f3a327.png)
+## Preview
+![image](https://user-images.githubusercontent.com/76241888/133603462-fe58c29e-3649-4d3b-88c4-49ec3ec59333.png)
 
 
 ## How to Run
