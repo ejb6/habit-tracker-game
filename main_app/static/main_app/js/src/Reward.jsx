@@ -93,12 +93,13 @@ function RewardPrompt() {
         <img src={promptItem.imgSrc} alt='Reward Item' />
         <div>
           Purchase
+          {' '}
           {promptItem.name}
           {' '}
           for
-          {price}
           {' '}
-          ?
+          {price}
+          {' ?'}
         </div>
       </div>
     );

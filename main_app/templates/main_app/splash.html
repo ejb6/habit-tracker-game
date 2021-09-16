@@ -2,9 +2,9 @@
 {% load static %}
 {% block body %}
 
-<div>
-	<div class="py-20 px-10 my-20">
-		<h1 class="font-weight-bold">Habit50 RPG</h1>
+<div class="row px-10 my-20">
+	<div class="col-md-5 py-20">
+		<h1 class="font-weight-bold">TaskRPG</h1>
 		<p class="font-size-16">
 			A gamified task manager similar to Habitica.
 		</p>
@@ -21,23 +21,28 @@
 			Sign Up
 		</button>
 	</div>
+	<div class="col-md-6 py-20">
+		<img class="img-fluid" src={% static 'main_app/images/tasks.png' %} alt="">
+	</div>
 </div>
 <div class="mx-0 container-fluid pt-15 px-10 border-top row">
 	<div class="col-md mx-sm-10">
 		<h3 class="font-weight-bold">Track Your Habits and Goals</h3>
 		<p class="font-size-16">
 			Stay accountable by tracking and managing your Habits, 
-			Daily goals, and ToDo list with Habit50's easy-to-use 
+			Daily goals, and ToDo list with TaskRPG's easy-to-use 
 			mobile and web interface.
 		</p>
+		<img class="w-half d-block m-auto" src={% static 'main_app/images/map.svg' %} alt="">
 	</div>
 	<div class="col-md mx-sm-10">
 		<h3 class="font-weight-bold">Earn Rewards For Your Goals</h3>
 		<p class="font-size-16">
 			Check off tasks to level up your character 
-			and unlock in-game features such as avatar 
-			customizations, accessories, and magic items!
+			and unlock in-game features such as avatars
+			and healing potions!
 		</p>
+		<img class="w-half d-block m-auto" src={% static 'main_app/images/food.svg' %} alt="">
 	</div>
 </div>
 
