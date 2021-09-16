@@ -6,11 +6,11 @@
 This is an RPG habit tracker/task manager similar to Habitica (in progress).
 
 
-## Preview
+# Preview
 ![image](https://user-images.githubusercontent.com/76241888/133603462-fe58c29e-3649-4d3b-88c4-49ec3ec59333.png)
 
 
-## How to Run
+# How to Run
 Please note that this project was developed using Python 3.9.6.
 1. Download a copy of this repo.
 3. Run the command line and change directory into the project (where `manage.py` is located)
@@ -18,7 +18,7 @@ Please note that this project was developed using Python 3.9.6.
 4. Run `python manage.py runserver`. This should output the address on the command line.
 5. Go into the address using your Browser.
 
-## Files and Folders
+# Files and Folders
 
 Django's `startproject` command was used to create `/habit_tracker` folder. This folder contains the `settings.py` which contains the project's configurations.
 
@@ -55,7 +55,7 @@ All the JavaScript files are located on `static/main_app/js`.
 - `misc.js` are the JS codes that are not used within the React files.
 - The rest of the files are used for developing React using NPM and Webpack. To install the dependencies (for contributing), run `npm install`. To transpile the code after modifying, run `npm run build`.
 
-## Features
+# Features
 
 ### To-dos
 
